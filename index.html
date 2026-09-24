@@ -1,0 +1,1343 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+  <title>Nuclear Decision Cockpit - Plataforma Integral OIEA</title>
+  
+  <!-- Tailwind CSS CDN para renderizado instantáneo y responsivo -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              cyan: '#06b6d4',
+              blue: '#2563eb',
+              indigo: '#4f46e5',
+              amber: '#f59e0b',
+              emerald: '#10b981',
+              rose: '#f43f5e'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+  
+  <style>
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 0.9; transform: scale(1); }
+      50% { opacity: 0.65; transform: scale(1.02); }
+    }
+    .animate-pulse-glow {
+      animation: pulseGlow 3.5s infinite ease-in-out;
+    }
+    /* Barras de desplazamiento estilizadas */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #020617;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1e293b;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #06b6d4;
+    }
+    /* Prevención de destellos en carga y soporte de selección */
+    .tab-panel.hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans min-h-screen p-2.5 sm:p-4 md:p-6 antialiased overflow-x-hidden">
+
+  <!-- CONTENEDOR PRINCIPAL -->
+  <div id="app" class="max-w-7xl mx-auto space-y-4 sm:space-y-6">
+
+    <!-- HEADER PRINCIPAL DE CONTROL ESTRATÉGICO -->
+    <header class="bg-slate-900/90 border border-slate-800 rounded-3xl p-4 sm:p-6 shadow-2xl relative overflow-hidden backdrop-blur">
+      <div class="absolute -right-20 -top-20 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -left-20 -bottom-20 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 relative z-10">
+        <!-- Identidad Institucional -->
+        <div class="flex items-center gap-3.5">
+          <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-cyan-500 via-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-cyan-500/30 flex-shrink-0 ring-2 ring-cyan-400/30">
+            <svg class="w-7 h-7 sm:w-8 sm:h-8 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="3" fill="currentColor" />
+              <ellipse cx="12" cy="12" rx="9" ry="3.5" transform="rotate(30 12 12)" />
+              <ellipse cx="12" cy="12" rx="9" ry="3.5" transform="rotate(90 12 12)" />
+              <ellipse cx="12" cy="12" rx="9" ry="3.5" transform="rotate(150 12 12)" />
+            </svg>
+          </div>
+          <div>
+            <div class="flex flex-wrap items-center gap-2">
+              <h1 class="text-lg sm:text-2xl font-black tracking-tight text-white">NUCLEAR DECISION COCKPIT</h1>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 uppercase tracking-wide">
+                IAEA Milestones Framework (NG-G-3.1 Rev. 2)
+              </span>
+            </div>
+            <p id="subheading-text" class="text-xs sm:text-sm text-slate-400 mt-0.5">
+              Suite de Autodiagnóstico Soberano y Orientación Estratégica en los 19 Aspectos del OIEA
+            </p>
+          </div>
+        </div>
+
+        <!-- Selectores Globales: Arquetipo País, Tecnología (SMR vs GW) e Idioma -->
+        <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
+          <!-- Selector País / Arquetipo -->
+          <div class="bg-slate-800/90 p-1 rounded-2xl border border-slate-700/60 shadow-inner">
+            <select id="country-select" class="bg-slate-900 text-xs font-bold text-cyan-300 px-3 py-1.5 rounded-xl border-none outline-none cursor-pointer">
+              <option value="colombia">🇨🇴 Colombia (Fase 1)</option>
+              <option value="embarking_p1">🌐 País Principiante (Fase 1)</option>
+              <option value="embarking_p2">🏗️ País Avanzado (Fase 2)</option>
+              <option value="expanding">⚛️ País con Infraestructura</option>
+              <option value="custom">✏️ Modo Autodiagnóstico (INIR)</option>
+            </select>
+          </div>
+
+          <!-- Selector Tecnología: SMR vs GW -->
+          <div class="flex bg-slate-800/90 p-1 rounded-2xl border border-slate-700/60 shadow-inner">
+            <button id="btn-tech-smr" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-indigo-600 text-white shadow transition">
+              ⚛️ SMR
+            </button>
+            <button id="btn-tech-gw" class="px-3 py-1.5 rounded-xl text-xs font-medium text-slate-400 hover:text-white transition">
+              🏭 Gran Escala
+            </button>
+          </div>
+
+          <!-- Selector Idioma (ES / EN) -->
+          <button id="btn-lang" class="px-3.5 py-1.5 rounded-2xl text-xs font-bold bg-slate-800 hover:bg-slate-700 border border-slate-700 text-cyan-400 transition">
+            🌐 ES
+          </button>
+        </div>
+      </div>
+
+      <!-- Barra de Fases del Enfoque de Hitos (Interactive Milestone Phase Step Bar) -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5 sm:gap-3 mt-4 sm:mt-6 pt-4 border-t border-slate-800">
+        <button id="phase-card-1" onclick="setPhase(1)" class="phase-card text-left p-3.5 rounded-2xl border transition-all relative overflow-hidden bg-gradient-to-r from-cyan-500/20 to-blue-500/10 border-cyan-500/50 text-cyan-300 ring-2 ring-cyan-400/50 shadow-lg">
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-[11px] font-black uppercase tracking-wider">FASE 1: Consideración</span>
+            <span class="text-[10px] px-2 py-0.5 rounded-full font-mono font-bold bg-cyan-400 text-slate-950">Fase 1</span>
+          </div>
+          <div class="text-sm font-bold text-slate-100">HITO 1: Decisión Soberana</div>
+          <div class="text-[11px] text-slate-300 mt-1 flex items-center gap-1.5 font-medium">
+            <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+            Informe Integral (Comprehensive Report)
+          </div>
+        </button>
+
+        <button id="phase-card-2" onclick="setPhase(2)" class="phase-card text-left p-3.5 rounded-2xl border transition-all relative overflow-hidden bg-slate-950/50 border-slate-800 hover:bg-slate-800/40 text-slate-400">
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-[11px] font-black uppercase tracking-wider">FASE 2: Preparación</span>
+            <span class="text-[10px] px-2 py-0.5 rounded-full font-mono font-bold bg-slate-800 text-slate-400">Fase 2</span>
+          </div>
+          <div class="text-sm font-bold text-slate-100">HITO 2: Convocatoria de Ofertas</div>
+          <div class="text-[11px] text-slate-400 mt-1 flex items-center gap-1.5 font-medium">
+            <span class="w-1.5 h-1.5 rounded-full bg-slate-600"></span>
+            Licitación y Creación del Regulador
+          </div>
+        </button>
+
+        <button id="phase-card-3" onclick="setPhase(3)" class="phase-card text-left p-3.5 rounded-2xl border transition-all relative overflow-hidden bg-slate-950/50 border-slate-800 hover:bg-slate-800/40 text-slate-400">
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-[11px] font-black uppercase tracking-wider">FASE 3: Construcción</span>
+            <span class="text-[10px] px-2 py-0.5 rounded-full font-mono font-bold bg-slate-800 text-slate-400">Fase 3</span>
+          </div>
+          <div class="text-sm font-bold text-slate-100">HITO 3: Puesta en Servicio</div>
+          <div class="text-[11px] text-slate-400 mt-1 flex items-center gap-1.5 font-medium">
+            <span class="w-1.5 h-1.5 rounded-full bg-slate-600"></span>
+            Carga de Combustible y Operación
+          </div>
+        </button>
+      </div>
+    </header>
+
+    <!-- BARRA DE PESTAÑAS (INTEGRACIÓN DE ESTRATEGIAS A, B, C, D Y SIMULADOR) -->
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <nav class="flex flex-wrap items-center gap-2">
+        <button onclick="setTab('radar')" id="tab-btn-radar" class="tab-btn px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-2xl text-xs sm:text-sm font-bold transition flex items-center gap-1.5 bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/25 border border-cyan-400/40">
+          <span>🕸️</span> <span>A. Radar & Brechas</span>
+        </button>
+        <button onclick="setTab('roadmap')" id="tab-btn-roadmap" class="tab-btn px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-2xl text-xs sm:text-sm font-bold transition flex items-center gap-1.5 bg-slate-900/80 hover:bg-slate-800 text-slate-400 border border-slate-800">
+          <span>⚡</span> <span>B. Gobernanza NEPIO</span>
+        </button>
+        <button onclick="setTab('studio')" id="tab-btn-studio" class="tab-btn px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-2xl text-xs sm:text-sm font-bold transition flex items-center gap-1.5 bg-slate-900/80 hover:bg-slate-800 text-slate-400 border border-slate-800">
+          <span>📑</span> <span>C. Fichas & Informe CR</span>
+        </button>
+        <button onclick="setTab('benchmark')" id="tab-btn-benchmark" class="tab-btn px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-2xl text-xs sm:text-sm font-bold transition flex items-center gap-1.5 bg-slate-900/80 hover:bg-slate-800 text-slate-400 border border-slate-800">
+          <span>🔬</span> <span>D. Benchmark SMR</span>
+        </button>
+        <button onclick="setTab('simulator')" id="tab-btn-simulator" class="tab-btn px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-2xl text-xs sm:text-sm font-bold transition flex items-center gap-1.5 bg-slate-900/80 hover:bg-slate-800 text-slate-400 border border-slate-800">
+          <span>⚖️</span> <span>Simulador Decisión</span>
+        </button>
+        <button onclick="setTab('inir')" id="tab-btn-inir" class="tab-btn px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-2xl text-xs sm:text-sm font-bold transition flex items-center gap-1.5 bg-slate-900/80 hover:bg-slate-800 text-slate-400 border border-slate-800">
+          <span>📝</span> <span>Autodiagnóstico INIR</span>
+        </button>
+      </nav>
+
+      <!-- Indicador Global de Madurez (Ponderado) -->
+      <div class="bg-slate-900/90 border border-slate-800 px-4 py-2 rounded-2xl flex items-center gap-3 shadow-md">
+        <span class="text-xs text-slate-400">Madurez Fase Activa:</span>
+        <div class="w-20 sm:w-28 bg-slate-950 h-2.5 rounded-full overflow-hidden border border-slate-800 p-0.5">
+          <div id="overall-bar" class="h-full bg-gradient-to-r from-amber-500 via-cyan-400 to-emerald-400 rounded-full transition-all duration-500" style="width: 35%;"></div>
+        </div>
+        <span id="overall-score-txt" class="text-sm font-black text-emerald-400 font-mono">35%</span>
+      </div>
+    </div>
+
+    <!-- =========================================================================
+        MÓDULO A: RADAR 360° & ANÁLISIS DE BRECHAS
+    ========================================================================= -->
+    <div id="panel-radar" class="tab-panel grid grid-cols-1 lg:grid-cols-12 gap-5">
+      <!-- Radar Vectorial SVG Interactivo -->
+      <div class="lg:col-span-6 bg-slate-900/80 border border-slate-800 rounded-3xl p-4 sm:p-5 shadow-xl flex flex-col items-center justify-between">
+        <div class="w-full flex items-center justify-between mb-1">
+          <div>
+            <h2 class="text-sm sm:text-base font-bold text-white flex items-center gap-2">
+              <span class="text-cyan-400">●</span> Radar de Infraestructura Nuclear (19 Aspectos)
+            </h2>
+            <p class="text-xs text-slate-400">Toca cualquier nodo o botón para inspeccionar brechas</p>
+          </div>
+          <span id="radar-phase-tag" class="text-xs px-2.5 py-1 rounded-xl bg-slate-800 text-cyan-300 font-mono font-bold">Fase 1</span>
+        </div>
+
+        <div class="relative w-full max-w-[340px] aspect-square flex items-center justify-center my-2">
+          <svg id="radar-svg" viewBox="0 0 340 340" class="w-full h-full overflow-visible"></svg>
+        </div>
+
+        <!-- Leyenda de Pilares OIEA -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 w-full pt-3 border-t border-slate-800 text-[11px]">
+          <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded bg-cyan-400"></span><span class="text-slate-300 truncate">Gobernanza & NEPIO</span></div>
+          <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded bg-emerald-400"></span><span class="text-slate-300 truncate">Seguridad & Ambiente</span></div>
+          <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded bg-indigo-400"></span><span class="text-slate-300 truncate">Legal & Regulatorio</span></div>
+          <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded bg-amber-400"></span><span class="text-slate-300 truncate">Seguridad & Salvaguardias</span></div>
+          <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded bg-pink-400"></span><span class="text-slate-300 truncate">Red & Combustible</span></div>
+          <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded bg-purple-400"></span><span class="text-slate-300 truncate">Talento & Cadena Valor</span></div>
+        </div>
+      </div>
+
+      <!-- Ficha de Diagnóstico del Aspecto Seleccionado -->
+      <div class="lg:col-span-6 flex flex-col gap-4">
+        <div class="bg-slate-900/80 border border-slate-800 rounded-3xl p-5 shadow-xl">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+            <div>
+              <div class="flex items-center gap-2">
+                <span id="card-issue-code" class="px-2.5 py-0.5 rounded-md bg-cyan-500/20 text-cyan-300 font-mono text-xs font-bold border border-cyan-500/30">
+                  Issue #01
+                </span>
+                <h3 id="card-issue-name" class="text-base sm:text-lg font-bold text-white">Posición Nacional y NEPIO</h3>
+              </div>
+              <span id="card-issue-ref" class="text-xs text-slate-400 font-mono">NG-G-3.1 Rev. 2 / NG-T-3.14</span>
+            </div>
+            <div class="text-right">
+              <span class="text-xs text-slate-400 block">Madurez</span>
+              <span id="card-issue-score" class="text-2xl font-black text-amber-400">45%</span>
+            </div>
+          </div>
+
+          <div class="space-y-3 mt-4 text-xs sm:text-sm">
+            <div class="bg-slate-950/70 p-3 rounded-2xl border border-slate-800">
+              <div class="text-slate-400 text-[11px] font-bold uppercase tracking-wider mb-1">🏛️ Mapeo Institucional País:</div>
+              <div id="card-issue-roles" class="text-cyan-300 font-semibold text-xs leading-relaxed"></div>
+            </div>
+
+            <div class="bg-slate-950/70 p-3 rounded-2xl border border-slate-800">
+              <div class="text-slate-400 text-[11px] font-bold uppercase tracking-wider mb-1">🎯 Condición Mandatoria para el Hito:</div>
+              <div id="card-issue-deliverable" class="text-slate-200 text-xs leading-relaxed"></div>
+            </div>
+
+            <div class="bg-rose-950/30 p-3 rounded-2xl border border-rose-900/40">
+              <div class="text-rose-400 text-[11px] font-bold uppercase tracking-wider mb-1">⚠️ Brecha Crítica (Gap Analysis):</div>
+              <div id="card-issue-gap" class="text-rose-200 text-xs leading-relaxed"></div>
+            </div>
+
+            <div class="bg-indigo-950/30 p-3 rounded-2xl border border-indigo-900/40">
+              <div class="text-indigo-400 text-[11px] font-bold uppercase tracking-wider mb-1">💡 Ventaja con Reactores Modulares (SMR):</div>
+              <div id="card-issue-smr" class="text-indigo-200 text-xs leading-relaxed"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Selector rápido de los 19 botones -->
+        <div class="bg-slate-900/80 border border-slate-800 rounded-3xl p-4 shadow-xl">
+          <div class="text-xs font-semibold text-slate-400 mb-2">Seleccionar Cuaderno Técnico (01 al 19):</div>
+          <div id="quick-buttons-container" class="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto pr-1"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- =========================================================================
+        MÓDULO B: GOBERNANZA NEPIO & RUTA CRÍTICA INTERACTIVA
+    ========================================================================= -->
+    <div id="panel-roadmap" class="tab-panel hidden space-y-6">
+      <div class="bg-slate-900/80 border border-slate-800 rounded-3xl p-5 sm:p-6 shadow-xl">
+        <h2 class="text-lg font-bold text-white flex items-center gap-2 mb-1">
+          <span>🏛️</span> Gobernanza Institucional Tripartita del OIEA (NG-T-3.6 Rev. 1)
+        </h2>
+        <p class="text-xs text-slate-400 mb-4">
+          Separación canónica de funciones: Quien formula la política (NEPIO), quien regula con total independencia (Autoridad de Seguridad) y quien opera la central (Owner/Operator).
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="bg-slate-950/80 border-2 border-cyan-500/40 rounded-2xl p-4 flex flex-col justify-between">
+            <div>
+              <div class="w-10 h-10 rounded-xl bg-cyan-500/20 text-cyan-300 flex items-center justify-center font-bold text-lg mb-2">1</div>
+              <h4 class="font-bold text-cyan-300 text-sm">NEPIO (Comité Directivo)</h4>
+              <p id="roadmap-gov-role" class="text-xs text-slate-300 font-semibold mt-1">MinMinas / Presidencia / UPME / DNP</p>
+              <p class="text-xs text-slate-400 mt-1">Lidera estudios de viabilidad, consenso político y formula el Comprehensive Report.</p>
+            </div>
+            <div class="mt-3 pt-2 border-t border-slate-800 text-[11px] text-cyan-400 font-mono">Mandato: Hito 1 (Decisión Soberana)</div>
+          </div>
+
+          <div class="bg-slate-950/80 border-2 border-emerald-500/40 rounded-2xl p-4 flex flex-col justify-between">
+            <div>
+              <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-300 flex items-center justify-center font-bold text-lg mb-2">2</div>
+              <h4 class="font-bold text-emerald-300 text-sm">Órgano Regulador Independiente</h4>
+              <p id="roadmap-reg-role" class="text-xs text-slate-300 font-semibold mt-1">Subdirección de Asuntos Nucleares (a escindir)</p>
+              <p class="text-xs text-slate-400 mt-1">Sin subordinación a entes de promoción energética; autonomía presupuestal y técnica.</p>
+            </div>
+            <div class="mt-3 pt-2 border-t border-slate-800 text-[11px] text-emerald-400 font-mono">Mandato: Hito 2 (Licenciamiento)</div>
+          </div>
+
+          <div class="bg-slate-950/80 border-2 border-purple-500/40 rounded-2xl p-4 flex flex-col justify-between">
+            <div>
+              <div class="w-10 h-10 rounded-xl bg-purple-500/20 text-purple-300 flex items-center justify-center font-bold text-lg mb-2">3</div>
+              <h4 class="font-bold text-purple-300 text-sm">Entidad Propietaria / Operadora</h4>
+              <p id="roadmap-op-role" class="text-xs text-slate-300 font-semibold mt-1">Por designar (Empresa Pública o Mixta / Genco)</p>
+              <p class="text-xs text-slate-400 mt-1">Responsable del contrato EPC, construcción, seguridad operacional y O&M.</p>
+            </div>
+            <div class="mt-3 pt-2 border-t border-slate-800 text-[11px] text-purple-400 font-mono">Mandato: Hito 3 (Operación Segura)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Simulador de Ruta Crítica What-If -->
+      <div class="bg-slate-900/80 border border-slate-800 rounded-3xl p-5 sm:p-6 shadow-xl">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-5 pb-4 border-b border-slate-800">
+          <div>
+            <h3 class="text-base font-bold text-white flex items-center gap-2">
+              <span>⏱️</span> Simulador Dinámico de Plazos y Dependencias Críticas (What-If)
+            </h3>
+            <p class="text-xs text-slate-400 mt-0.5">
+              Simula qué ocurre si se retrasa la aprobación de la Ley Nuclear en el Congreso
+            </p>
+          </div>
+
+          <div class="flex items-center gap-3 bg-slate-950 p-2.5 rounded-2xl border border-slate-800">
+            <span class="text-xs text-slate-400 font-medium">Demora en Ley Nuclear:</span>
+            <input type="range" id="delay-slider" min="0" max="48" step="6" value="0" class="w-24 accent-cyan-400 cursor-pointer" oninput="updateDelay(this.value)">
+            <span id="delay-value-txt" class="text-sm font-black text-amber-400 font-mono">+0 m</span>
+          </div>
+        </div>
+
+        <div id="roadmap-timeline-container" class="space-y-3"></div>
+      </div>
+    </div>
+
+    <!-- =========================================================================
+        MÓDULO C: FICHAS EJECUTIVAS & ASISTENTE INFORME CR
+    ========================================================================= -->
+    <div id="panel-studio" class="tab-panel hidden space-y-6">
+      <div class="bg-slate-900/90 border-2 border-cyan-500/30 rounded-3xl p-5 sm:p-6 shadow-2xl relative overflow-hidden">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+          <div>
+            <span class="text-xs font-mono font-bold px-3 py-1 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+              IAEA-TECDOC-1993 & NG-T-3.14
+            </span>
+            <h2 class="text-lg sm:text-2xl font-black text-white mt-2">
+              Asistente de Redacción del Informe Integral (Comprehensive Report)
+            </h2>
+            <p class="text-xs text-slate-400 mt-1">
+              Estructura oficial para la formulación del documento que fundamenta la decisión soberana de Hito 1
+            </p>
+          </div>
+          <div class="text-left md:text-right">
+            <span class="text-xs text-slate-400 block">Capítulo Activo:</span>
+            <span id="cr-chapter-name" class="text-sm font-bold text-amber-400 font-mono">Capítulo 1: Fundamento Estratégico</span>
+          </div>
+        </div>
+
+        <!-- 3 Preguntas de Alto Nivel para Ministros -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 my-5">
+          <div class="bg-slate-950/80 p-4 rounded-2xl border border-slate-800">
+            <div class="text-amber-400 font-black text-xs uppercase mb-1">1. ¿Por qué Energía Nuclear?</div>
+            <p class="text-xs text-slate-300 leading-relaxed">
+              Confiabilidad de base 24/7, descarbonización profunda de la matriz eléctrica e industrial, y resiliencia ante sequías climáticas severas (ej. Fenómeno de El Niño).
+            </p>
+          </div>
+
+          <div class="bg-slate-950/80 p-4 rounded-2xl border border-slate-800">
+            <div class="text-cyan-400 font-black text-xs uppercase mb-1">2. ¿Cuál es el compromiso?</div>
+            <p class="text-xs text-slate-300 leading-relaxed">
+              Pacto de Estado superior a 100 años (10 años de preparación + 60 años de operación comercial + 30+ años de custodia y desmantelamiento).
+            </p>
+          </div>
+
+          <div class="bg-slate-950/80 p-4 rounded-2xl border border-slate-800">
+            <div class="text-emerald-400 font-black text-xs uppercase mb-1">3. ¿Qué se decide en el Hito 1?</div>
+            <p class="text-xs text-slate-300 leading-relaxed">
+              No es comprar un reactor. Es la decisión soberana e informada de crear la infraestructura legal, regulatoria e institucional en la Fase 2.
+            </p>
+          </div>
+        </div>
+
+        <!-- Contenido Técnico Requerido por el OIEA -->
+        <div class="bg-slate-950/90 p-4 sm:p-5 rounded-2xl border border-slate-800">
+          <div class="flex items-center justify-between mb-3">
+            <h4 id="cr-box-title" class="text-sm font-bold text-slate-100 flex items-center gap-2">
+              <span>📋</span> Contenido Técnico Exigido por el OIEA para el Issue #01
+            </h4>
+            <span id="cr-box-ref" class="text-xs text-slate-400 font-mono">NG-G-3.1 Rev. 2</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+            <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800">
+              <strong class="text-cyan-300 block mb-1">1. Diagnóstico de la Situación Nacional:</strong>
+              <p id="cr-sec-1" class="text-slate-300 leading-relaxed"></p>
+            </div>
+            <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800">
+              <strong class="text-amber-300 block mb-1">2. Acciones Mandatorias para el Hito 1:</strong>
+              <p id="cr-sec-2" class="text-slate-300 leading-relaxed"></p>
+            </div>
+            <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800">
+              <strong class="text-rose-300 block mb-1">3. Principales Riesgos y Cuellos de Botella:</strong>
+              <p id="cr-sec-3" class="text-slate-300 leading-relaxed"></p>
+            </div>
+            <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800">
+              <strong class="text-purple-300 block mb-1">4. Recomendación para la NEPIO en Fase 2:</strong>
+              <p id="cr-sec-4" class="text-slate-300 leading-relaxed"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- =========================================================================
+        MÓDULO D: BENCHMARK TECNOLÓGICO SMR VS GRAN ESCALA (GW)
+    ========================================================================= -->
+    <div id="panel-benchmark" class="tab-panel hidden space-y-6">
+      <div class="bg-slate-900/80 border border-slate-800 rounded-3xl p-5 sm:p-6 shadow-xl">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+          <div>
+            <h2 class="text-lg font-bold text-white flex items-center gap-2">
+              <span>🔬</span> Matriz de Impacto en Infraestructura: Reactores Modulares (SMR) vs. Gran Escala
+            </h2>
+            <p class="text-xs text-slate-400 mt-0.5">
+              Análisis comparativo de cómo los reactores modulares transforman las exigencias de los 19 aspectos del OIEA
+            </p>
+          </div>
+          <span class="px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-semibold border border-indigo-500/30 w-fit">
+            IAEA SMR Annex (NG-G-3.1 Rev. 2)
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
+          <!-- Tarjeta SMR -->
+          <div class="bg-indigo-950/25 border-2 border-indigo-500/50 rounded-3xl p-5 sm:p-6 flex flex-col justify-between shadow-lg">
+            <div>
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="text-base sm:text-lg font-bold text-indigo-300 flex items-center gap-2">
+                  ⚛️ Reactores Modulares Pequeños (SMR)
+                </h3>
+                <span class="text-xs px-2.5 py-1 rounded-lg bg-indigo-500/30 text-indigo-200 font-mono font-bold">10 - 300 MWe</span>
+              </div>
+              <ul class="space-y-3.5 text-xs text-slate-300">
+                <li class="flex items-start gap-2.5">
+                  <span class="text-emerald-400 font-bold text-sm">✓</span>
+                  <div><strong class="text-slate-100">Red Eléctrica:</strong> No requiere grandes expansiones en líneas de 500 kV; adaptable a nodos minero-energéticos.</div>
+                </li>
+                <li class="flex items-start gap-2.5">
+                  <span class="text-emerald-400 font-bold text-sm">✓</span>
+                  <div><strong class="text-slate-100">Inversión (CAPEX):</strong> Menor desembolso inicial ($1B - $2.5B USD); adición modular escalable.</div>
+                </li>
+                <li class="flex items-start gap-2.5">
+                  <span class="text-emerald-400 font-bold text-sm">✓</span>
+                  <div><strong class="text-slate-100">Zona de Emergencia (EPZ):</strong> Confinada al perímetro de la central, facilitando la convivencia comunitaria.</div>
+                </li>
+                <li class="flex items-start gap-2.5">
+                  <span class="text-emerald-400 font-bold text-sm">✓</span>
+                  <div><strong class="text-slate-100">Construcción:</strong> 24 a 36 meses gracias al ensamblaje modular estandarizado en fábrica.</div>
+                </li>
+              </ul>
+            </div>
+            <div class="mt-5 pt-3 border-t border-indigo-900/60 text-[11px] text-indigo-300 font-medium">
+              Recomendado para: Sustitución de termoeléctricas de carbón (repowering), distritos térmicos y redes medianas.
+            </div>
+          </div>
+
+          <!-- Tarjeta Gran Escala -->
+          <div class="bg-slate-950/80 border border-slate-800 rounded-3xl p-5 sm:p-6 flex flex-col justify-between shadow-lg">
+            <div>
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="text-base sm:text-lg font-bold text-slate-200 flex items-center gap-2">
+                  🏭 Centrales Convencionales (Gigavatio)
+                </h3>
+                <span class="text-xs px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 font-mono font-bold">1000 - 1600 MWe</span>
+              </div>
+              <ul class="space-y-3.5 text-xs text-slate-400">
+                <li class="flex items-start gap-2.5">
+                  <span class="text-amber-400 font-bold text-sm">!</span>
+                  <div><strong class="text-slate-200">Red Eléctrica:</strong> Requiere una red masiva con reserva rodante robusta para soportar contingencias N-1.</div>
+                </li>
+                <li class="flex items-start gap-2.5">
+                  <span class="text-amber-400 font-bold text-sm">!</span>
+                  <div><strong class="text-slate-200">Inversión (CAPEX):</strong> Elevado desembolso inicial ($8B - $15B+ USD) con alto riesgo financiero durante obras.</div>
+                </li>
+                <li class="flex items-start gap-2.5">
+                  <span class="text-amber-400 font-bold text-sm">!</span>
+                  <div><strong class="text-slate-200">Zona de Emergencia (EPZ):</strong> Radio de 15 a 30 km que exige planes masivos de evacuación territorial.</div>
+                </li>
+                <li class="flex items-start gap-2.5">
+                  <span class="text-amber-400 font-bold text-sm">!</span>
+                  <div><strong class="text-slate-200">Construcción:</strong> 7 a 10+ años de ejecución de obra civil intensiva en sitio.</div>
+                </li>
+              </ul>
+            </div>
+            <div class="mt-5 pt-3 border-t border-slate-800 text-[11px] text-slate-400 font-medium">
+              Recomendado para: Países con demanda industrial masiva y redes eléctricas hiper-conectadas.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- =========================================================================
+        MÓDULO E: SIMULADOR DE DECISIÓN SOBERANA
+    ========================================================================= -->
+    <div id="panel-simulator" class="tab-panel hidden space-y-6">
+      <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 sm:p-6 shadow-2xl">
+        <div class="max-w-3xl mb-5">
+          <h2 class="text-lg font-bold text-white flex items-center gap-2">
+            <span>⚖️</span> Simulador de Decisión Soberana & Recomendación de Política Pública
+          </h2>
+          <p class="text-xs text-slate-400 mt-1">
+            Diagnóstico ejecutivo automático calculado sobre el nivel de madurez alcanzado en los 19 aspectos del OIEA
+          </p>
+        </div>
+
+        <div class="bg-slate-950/80 p-4 sm:p-5 rounded-2xl border border-slate-800 mb-6">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
+            <div>
+              <span class="text-xs text-slate-400 uppercase tracking-wider">Dictamen para:</span>
+              <div id="sim-country-name" class="text-base sm:text-lg font-bold text-cyan-300">Colombia (Fase 1 Inicial)</div>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs text-slate-400 font-mono">Fase Evaluada:</span>
+              <span id="sim-phase-tag" class="px-3 py-1 rounded-lg bg-cyan-500/20 text-cyan-300 font-mono font-bold text-xs">Fase 1</span>
+            </div>
+          </div>
+
+          <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3.5 text-xs">
+            <div class="p-3 rounded-xl bg-slate-900 border border-slate-800">
+              <span class="text-slate-400 block mb-1 font-semibold">Estado del Hito:</span>
+              <span id="sim-milestone-status" class="text-amber-400 font-bold text-sm">En Formulación (Estudios Iniciales)</span>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-900 border border-slate-800">
+              <span class="text-slate-400 block mb-1 font-semibold">Tecnología Sugerida:</span>
+              <span id="sim-tech-status" class="text-cyan-400 font-bold text-sm">SMR (Reactores Modulares Pequeños)</span>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-900 border border-slate-800">
+              <span class="text-slate-400 block mb-1 font-semibold">Tiempo Estimado a Hito:</span>
+              <span id="sim-time-status" class="text-emerald-400 font-bold text-sm">18 a 36 meses</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3 Prioridades Inmediatas -->
+        <div class="space-y-3">
+          <h3 class="text-sm font-bold text-slate-200">📌 Las 3 Acciones Prioritarias Inmediatas para el Gobierno:</h3>
+
+          <div class="p-4 rounded-2xl bg-cyan-950/20 border border-cyan-500/40 flex items-start gap-3 text-xs">
+            <span class="w-6 h-6 rounded-full bg-cyan-500 text-slate-950 font-black flex items-center justify-center flex-shrink-0 mt-0.5">1</span>
+            <div>
+              <strong class="text-cyan-300 block text-sm">Formalizar la NEPIO mediante Decreto Presidencial</strong>
+              <p class="text-slate-300 mt-1 leading-relaxed">
+                Crear el Comité Directivo Interministerial con mandato explícito, presupuesto propio asignado y secretaría técnica permanente para conducir los estudios de prefactibilidad.
+              </p>
+            </div>
+          </div>
+
+          <div class="p-4 rounded-2xl bg-indigo-950/20 border border-indigo-500/40 flex items-start gap-3 text-xs">
+            <span class="w-6 h-6 rounded-full bg-indigo-500 text-white font-black flex items-center justify-center flex-shrink-0 mt-0.5">2</span>
+            <div>
+              <strong class="text-indigo-300 block text-sm">Redactar el Proyecto de Ley Nuclear Integral</strong>
+              <p class="text-slate-300 mt-1 leading-relaxed">
+                Garantizar la escisión regulatoria obligatoria: crear una Autoridad Nacional de Seguridad Nuclear 100% autónoma del sector promotor de energía, cumpliendo la norma OIEA GSR Part 1.
+              </p>
+            </div>
+          </div>
+
+          <div class="p-4 rounded-2xl bg-emerald-950/20 border border-emerald-500/40 flex items-start gap-3 text-xs">
+            <span class="w-6 h-6 rounded-full bg-emerald-500 text-slate-950 font-black flex items-center justify-center flex-shrink-0 mt-0.5">3</span>
+            <div>
+              <strong class="text-emerald-300 block text-sm">Completar el Comprehensive Report (Informe Integral de Hito 1)</strong>
+              <p class="text-slate-300 mt-1 leading-relaxed">
+                Consolidar los estudios de viabilidad de los 19 aspectos del OIEA para fundamentar la decisión política ante el Congreso y la opinión pública nacional e internacional.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- =========================================================================
+        MÓDULO F: AUTODIAGNÓSTICO INIR INTERACTIVO
+    ========================================================================= -->
+    <div id="panel-inir" class="tab-panel hidden space-y-6">
+      <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 sm:p-6 shadow-2xl">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+          <div>
+            <span class="text-xs font-mono font-bold px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+              IAEA Services Series No. 34 & NG-T-3.2 Rev. 1
+            </span>
+            <h2 class="text-lg sm:text-xl font-bold text-white mt-2 flex items-center gap-2">
+              <span>📝</span> Módulo de Autoevaluación INIR (Integrated Nuclear Infrastructure Review)
+            </h2>
+            <p class="text-xs text-slate-400 mt-1">
+              Ajusta interactivamente los niveles de cumplimiento para calibrar las brechas de tu país en tiempo real.
+            </p>
+          </div>
+
+          <button onclick="loadSampleScenario()" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs text-cyan-300 font-bold border border-slate-700 transition">
+            ⚡ Cargar Escenario Simulado
+          </button>
+        </div>
+
+        <div id="inir-sliders-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 mt-5"></div>
+      </div>
+    </div>
+
+    <!-- FOOTER METODOLÓGICO -->
+    <footer class="p-4 rounded-2xl bg-slate-900/60 border border-slate-800 text-center text-xs text-slate-400 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div>
+        Basado en la metodología oficial del <strong>Organismo Internacional de Energía Atómica (OIEA)</strong> — Documentos NG-G-3.1 Rev. 2, NG-T-3.14, NG-T-3.6 Rev. 1 y TECDOC-1993.
+      </div>
+      <div class="font-mono text-cyan-400 font-bold">19 Cuadernos Técnicos de Infraestructura</div>
+    </footer>
+  </div>
+
+  <!-- =========================================================================
+      LÓGICA JAVASCRIPT NATIVA REACTIVA (SINGLE-FILE RUNNABLE ENGINE)
+  ========================================================================= -->
+  <script>
+    // PERFILES PAÍS Y ROLES INSTITUCIONALES OFICIALES
+    const COUNTRY_PROFILES = {
+      colombia: {
+        id: 'colombia',
+        flag: '🇨🇴',
+        name: { es: 'Colombia (Fase 1 Inicial)', en: 'Colombia (Phase 1 Embarking)' },
+        roles: {
+          gov: 'MinMinas (MME) / Presidencia / UPME / DNP',
+          reg: 'Subdirección Asuntos Nucleares (MME) [A escindir]',
+          op: 'Por designar (Empresa Pública o Mixta / Genco)'
+        }
+      },
+      embarking_p1: {
+        id: 'embarking_p1',
+        flag: '🌐',
+        name: { es: 'País Principiante (Fase 1 OIEA)', en: 'Generic Embarking (Phase 1)' },
+        roles: {
+          gov: 'Ministerio de Energía / Comisión Presidencial NEPIO',
+          reg: 'Autoridad Radiológica (en transición a Nuclear)',
+          op: 'Empresa Eléctrica Nacional o Entidad Promotora'
+        }
+      },
+      embarking_p2: {
+        id: 'embarking_p2',
+        flag: '🏗️',
+        name: { es: 'País en Preparación (Fase 2)', en: 'Advanced Embarking (Phase 2)' },
+        roles: {
+          gov: 'NEPIO Permanente / Ministerio de Planificación',
+          reg: 'Autoridad Regulatoria Nuclear Autónoma en formación',
+          op: 'Organización Propietaria-Operadora (Owner/Operator)'
+        }
+      },
+      expanding: {
+        id: 'expanding',
+        flag: '⚛️',
+        name: { es: 'País con Infraestructura / Expansión', en: 'Expanding / Nuclear Experience' },
+        roles: {
+          gov: 'Ministerio de Energía / Comisión Nacional Atómica',
+          reg: 'Autoridad Regulatoria Nuclear consolidada',
+          op: 'Empresa Nuclear Operadora con licencia activa'
+        }
+      },
+      custom: {
+        id: 'custom',
+        flag: '✏️',
+        name: { es: 'Mi País (Autodiagnóstico INIR)', en: 'Custom Country (Self-Assessment)' },
+        roles: {
+          gov: 'Entidad Gubernamental / NEPIO Nacional',
+          reg: 'Ente Regulador Designado',
+          op: 'Entidad Propietaria / Operador de Red'
+        }
+      }
+    };
+
+    // BASE DE DATOS DE LOS 19 ASPECTOS OIEA (NG-G-3.1 Rev. 2)
+    const INFRASTRUCTURE_ISSUES = [
+      {
+        id: 1, code: '01', cat: 'governance', weight: 10,
+        name: { es: 'Posición Nacional y NEPIO', en: 'National Position & NEPIO' },
+        refOIEA: 'NG-G-3.1 Rev. 2 / NG-T-3.14 / NG-T-3.6',
+        crChapter: 'Capítulo 1: Fundamento Estratégico y Compromiso Soberano',
+        scores: { colombia: { p1: 45, p2: 15, p3: 0 }, embarking_p1: { p1: 30, p2: 10, p3: 0 }, embarking_p2: { p1: 85, p2: 60, p3: 15 }, expanding: { p1: 95, p2: 85, p3: 70 } },
+        phaseDeliverables: {
+          p1: 'Comprehensive Report (Informe Integral) aprobado a nivel gubernamental para fundamentar la decisión soberana de Hito 1.',
+          p2: 'Política nuclear de Estado promulgada y estructura institucional permanente establecida (NEPIO ejecutiva).',
+          p3: 'Supervisión gubernamental continua del comisionamiento y operación comercial a largo plazo.'
+        },
+        criticalGaps: 'Falta de consenso político suprapartidista y ausencia de un mandato formal por decreto para la NEPIO.',
+        risks: 'Cancelación o parálisis del programa por alternancia de gobiernos si no existe un pacto de Estado de 100 años.',
+        smrImpact: 'Menor tiempo de justificación pública y flexibilidad para planes de transición energética territorial.'
+      },
+      {
+        id: 2, code: '02', cat: 'safety', weight: 9,
+        name: { es: 'Seguridad Nuclear', en: 'Nuclear Safety' },
+        refOIEA: 'SF-1 / GSR Part 1 / SSG-16',
+        crChapter: 'Capítulo 2: Filosofía y Política de Seguridad Nuclear',
+        scores: { colombia: { p1: 35, p2: 10, p3: 0 }, embarking_p1: { p1: 25, p2: 10, p3: 0 }, embarking_p2: { p1: 80, p2: 65, p3: 20 }, expanding: { p1: 95, p2: 90, p3: 75 } },
+        phaseDeliverables: {
+          p1: 'Declaración formal de política de seguridad nuclear y adhesión a la Convención de Seguridad Nuclear (CNS).',
+          p2: 'Desarrollo del marco reglamentario técnico y emisión de la licencia de construcción preliminar.',
+          p3: 'Emisión de la licencia de operación comercial tras verificación de pruebas preoperacionales.'
+        },
+        criticalGaps: 'El ministerio actúa hoy como promotor y regulador; se requiere separación regulatoria estricta.',
+        risks: 'Pérdida de credibilidad internacional si la autoridad de seguridad carece de independencia técnica.',
+        smrImpact: 'Sistemas de seguridad pasiva (enfriamiento por gravedad y convección natural) reducen riesgos operacionales.'
+      },
+      {
+        id: 3, code: '03', cat: 'governance', weight: 7,
+        name: { es: 'Gestión y Liderazgo', en: 'Management for Safety' },
+        refOIEA: 'GS-G-3.1 / GSR Part 2',
+        crChapter: 'Capítulo 3: Sistema de Gestión Integrado y Liderazgo',
+        scores: { colombia: { p1: 25, p2: 5, p3: 0 }, embarking_p1: { p1: 20, p2: 5, p3: 0 }, embarking_p2: { p1: 75, p2: 55, p3: 15 }, expanding: { p1: 90, p2: 85, p3: 65 } },
+        phaseDeliverables: {
+          p1: 'Sistema de gestión de calidad y procesos documentados para los estudios de Fase 1 de la NEPIO.',
+          p2: 'Estructura de gestión de megaproyectos y gobernanza de riesgos en la entidad operadora.',
+          p3: 'Sistema de gestión integrado plenamente certificado (calidad, ambiental, seguridad física).'
+        },
+        criticalGaps: 'Escasez de directivos con experiencia en gobernanza de megaproyectos tecnológicos de alta complejidad.',
+        risks: 'Fallas sistémicas en la supervisión de contratistas y desvíos presupuestales masivos.',
+        smrImpact: 'Construcción en fábrica con calidad estandarizada reduce la complejidad de gestión en sitio.'
+      },
+      {
+        id: 4, code: '04', cat: 'governance', weight: 9,
+        name: { es: 'Financiamiento y Fondos', en: 'Funding & Financing' },
+        refOIEA: 'NG-T-4.2 / IAEA-TECDOC-1993',
+        crChapter: 'Capítulo 4: Viabilidad Económica, Financiera y Modelos de Negocio',
+        scores: { colombia: { p1: 30, p2: 5, p3: 0 }, embarking_p1: { p1: 25, p2: 5, p3: 0 }, embarking_p2: { p1: 70, p2: 50, p3: 10 }, expanding: { p1: 90, p2: 80, p3: 60 } },
+        phaseDeliverables: {
+          p1: 'Modelo macroeconómico comparativo (LCOE/LFS) y evaluación de modelos de negocio (EPC, BOO, BOOT, PPA).',
+          p2: 'Cierre financiero, garantías soberanas y constitución de fideicomisos para residuos y desmantelamiento.',
+          p3: 'Flujo de caja comercial activo y aportes periódicos al fondo de desmantelamiento.'
+        },
+        criticalGaps: 'Falta de estructuración de garantías soberanas y mecanismos de mitigación del riesgo país.',
+        risks: 'Incapacidad de absorción de deuda soberana para proyectos intensivos en capital (CAPEX).',
+        smrImpact: 'Inversión inicial escalable ($1B-$2.5B USD frente a $8B-$15B de grandes reactores); fases modulares.'
+      },
+      {
+        id: 5, code: '05', cat: 'legal', weight: 8,
+        name: { es: 'Marco Legal Nuclear', en: 'Legal Framework' },
+        refOIEA: 'Handbook on Nuclear Law / GSR Part 1',
+        crChapter: 'Capítulo 5: Régimen Jurídico y Tratados Internacionales',
+        scores: { colombia: { p1: 40, p2: 10, p3: 0 }, embarking_p1: { p1: 35, p2: 10, p3: 0 }, embarking_p2: { p1: 85, p2: 60, p3: 20 }, expanding: { p1: 95, p2: 90, p3: 75 } },
+        phaseDeliverables: {
+          p1: 'Inventario legal y adhesión a las 4 convenciones pilares (Seguridad, Responsabilidad Civil, Notificación, Salvaguardias).',
+          p2: 'Promulgación de la Ley Nuclear Integral que crea la autoridad regulatoria y el régimen de responsabilidad.',
+          p3: 'Cuerpo normativo y decretos reglamentarios secundarios en plena vigencia.'
+        },
+        criticalGaps: 'Ausencia de una Ley Nuclear Integral que regule la generación nucleoeléctrica de potencia comercial.',
+        risks: 'Vacío normativo en responsabilidad civil por daños nucleares que ahuyente a contratistas internacionales.',
+        smrImpact: 'Permite incorporar figuras modernas de licenciamiento compartido y estandarizado.'
+      },
+      {
+        id: 6, code: '06', cat: 'legal', weight: 9,
+        name: { es: 'Marco Regulatorio', en: 'Regulatory Framework' },
+        refOIEA: 'GSR Part 1 / SSG-16',
+        crChapter: 'Capítulo 6: Autoridad Regulatoria Independiente y Licenciamiento',
+        scores: { colombia: { p1: 30, p2: 5, p3: 0 }, embarking_p1: { p1: 25, p2: 5, p3: 0 }, embarking_p2: { p1: 80, p2: 55, p3: 15 }, expanding: { p1: 95, p2: 85, p3: 70 } },
+        phaseDeliverables: {
+          p1: 'Hoja de ruta institucional para escindir y crear el regulador nuclear independiente.',
+          p2: 'Regulador autónomo dotado de presupuesto propio, planta técnica calificada y guías de licenciamiento.',
+          p3: 'Capacidad total de inspección continua, fiscalización y régimen sancionatorio activo.'
+        },
+        criticalGaps: 'Déficit de personal técnico especializado en evaluación de seguridad de reactores de potencia.',
+        risks: 'Retrasos crónicos en licencias por falta de capacidad evaluadora del regulador.',
+        smrImpact: 'Posibilidad de cooperación técnica bilateral con reguladores de países de origen (US NRC, CNSC, etc.).'
+      },
+      {
+        id: 7, code: '07', cat: 'security', weight: 6,
+        name: { es: 'Régimen de Salvaguardias', en: 'Safeguards' },
+        refOIEA: 'INFCIRC/153 / Protocolo Adicional',
+        crChapter: 'Capítulo 7: No Proliferación y Control de Materiales Nucleares',
+        scores: { colombia: { p1: 60, p2: 20, p3: 0 }, embarking_p1: { p1: 60, p2: 20, p3: 0 }, embarking_p2: { p1: 85, p2: 65, p3: 30 }, expanding: { p1: 95, p2: 90, p3: 85 } },
+        phaseDeliverables: {
+          p1: 'Verificación del Acuerdo de Salvaguardias Amplias y Protocolo Adicional con el OIEA.',
+          p2: 'Establecimiento del Sistema Estatal de Contabilidad y Control de Materiales Nucleares (SSAC).',
+          p3: 'Inspecciones periódicas de verificación física del combustible junto con inspectores del OIEA.'
+        },
+        criticalGaps: 'El SSAC existente en muchos países está dimensionado para pequeñas cantidades de investigación, no para reactores de potencia.',
+        risks: 'Sanciones o trabas internacionales de suministro por fallas en el reporte de inventario nuclear.',
+        smrImpact: 'Núcleos sellados y recargas espaciadas (3 a 10 años) simplifican las tareas de salvaguardias del OIEA.'
+      },
+      {
+        id: 8, code: '08', cat: 'safety', weight: 7,
+        name: { es: 'Protección Radiológica', en: 'Radiation Protection' },
+        refOIEA: 'GSR Part 3 / GSG-7',
+        crChapter: 'Capítulo 8: Protección Radiológica y Salud Pública',
+        scores: { colombia: { p1: 50, p2: 15, p3: 0 }, embarking_p1: { p1: 45, p2: 15, p3: 0 }, embarking_p2: { p1: 80, p2: 60, p3: 25 }, expanding: { p1: 95, p2: 90, p3: 80 } },
+        phaseDeliverables: {
+          p1: 'Evaluación del marco nacional de radioprotección para adecuar límites ocupacionales y de público.',
+          p2: 'Normativa detallada de optimización (ALARA), límites de descarga ambiental y monitoreo basal.',
+          p3: 'Red nacional de dosimetría activa y monitoreo radiológico en tiempo real alrededor del emplazamiento.'
+        },
+        criticalGaps: 'Capacidad limitada en laboratorios secundarios de calibración dosimétrica para altas dosis.',
+        risks: 'Exposiciones no controladas o sobrepasar límites de vertido autorizados.',
+        smrImpact: 'Inventario de fuentes menor y blindajes integrados de diseño en el módulo del reactor.'
+      },
+      {
+        id: 9, code: '09', cat: 'technical', weight: 8,
+        name: { es: 'Red Eléctrica e Infraestructura', en: 'Electrical Grid' },
+        refOIEA: 'NG-T-3.8 / NP-T-3.21',
+        crChapter: 'Capítulo 9: Integración al Sistema Interconectado y Estabilidad',
+        scores: { colombia: { p1: 40, p2: 10, p3: 0 }, embarking_p1: { p1: 35, p2: 10, p3: 0 }, embarking_p2: { p1: 75, p2: 55, p3: 20 }, expanding: { p1: 90, p2: 85, p3: 75 } },
+        phaseDeliverables: {
+          p1: 'Estudio de estabilidad dinámica, contingencia (N-1) y capacidad de absorción del Sistema Interconectado.',
+          p2: 'Expansión de subestaciones y líneas de transmisión de alta tensión con doble alimentación externa.',
+          p3: 'Sincronización segura de la central nuclear con el despacho del sistema eléctrico nacional.'
+        },
+        criticalGaps: 'Criterio del 10% del OIEA: una sola unidad no debe exceder el 10% de la capacidad de la red.',
+        risks: 'Desconexión de la central que provoque un colapso en cascada de la red eléctrica nacional.',
+        smrImpact: 'Los SMR (70-300 MWe) encajan perfectamente en topologías de red en desarrollo y nodos mineros.'
+      },
+      {
+        id: 10, code: '10', cat: 'human', weight: 8,
+        name: { es: 'Recursos Humanos y Educación', en: 'Human Resource Development' },
+        refOIEA: 'NG-G-2.1 / NG-T-2.3',
+        crChapter: 'Capítulo 10: Plan Maestro de Talento Humano y Capacidad Nuclear',
+        scores: { colombia: { p1: 20, p2: 5, p3: 0 }, embarking_p1: { p1: 20, p2: 5, p3: 0 }, embarking_p2: { p1: 70, p2: 50, p3: 15 }, expanding: { p1: 90, p2: 85, p3: 70 } },
+        phaseDeliverables: {
+          p1: 'Plan Maestro de Desarrollo de Recursos Humanos Nuclear (técnico, regulador, legal y directivo).',
+          p2: 'Programas de pregrado/posgrado en ciencias nucleares activos y convenios de capacitación internacional.',
+          p3: 'Personal 100% certificado con licencias de operadores de sala de control emitidas.'
+        },
+        criticalGaps: 'Falta de programas universitarios formales en ingeniería nuclear aplicada a potencia.',
+        risks: 'Fuga de talentos capacitados y dependencia crítica de consultores extranjeros.',
+        smrImpact: 'Menor plantilla de operadores en sitio gracias al alto nivel de automatización digital.'
+      },
+      {
+        id: 11, code: '11', cat: 'governance', weight: 9,
+        name: { es: 'Partes Interesadas y Comunicación', en: 'Stakeholder Involvement' },
+        refOIEA: 'NG-T-1.2 / INSAG-20',
+        crChapter: 'Capítulo 11: Estrategia de Diálogo Social y Consulta Ciudadana',
+        scores: { colombia: { p1: 15, p2: 5, p3: 0 }, embarking_p1: { p1: 15, p2: 5, p3: 0 }, embarking_p2: { p1: 70, p2: 45, p3: 15 }, expanding: { p1: 85, p2: 80, p3: 65 } },
+        phaseDeliverables: {
+          p1: 'Estrategia nacional de comunicación transparente, pedagogía nuclear y diálogo con líderes de opinión.',
+          p2: 'Procesos de consulta previa, audiencias públicas y mesas de concertación territorial.',
+          p3: 'Centros de información comunitaria abiertos en el municipio anfitrión con monitoreo participativo.'
+        },
+        criticalGaps: 'Alta estigmatización y desinformación sobre la energía nuclear en el imaginario público.',
+        risks: 'Oposición social o judicial que paralice el proyecto por falta de licencia social.',
+        smrImpact: 'Menor percepción de riesgo y posibilidad de usos directos de calor para industrias y distritos térmicos.'
+      },
+      {
+        id: 12, code: '12', cat: 'technical', weight: 8,
+        name: { es: 'Emplazamiento e Instalaciones', en: 'Site & Supporting Facilities' },
+        refOIEA: 'SSG-35 / NS-R-3 Rev. 1',
+        crChapter: 'Capítulo 12: Evaluación y Selección de Emplazamientos Candidatos',
+        scores: { colombia: { p1: 25, p2: 5, p3: 0 }, embarking_p1: { p1: 25, p2: 5, p3: 0 }, embarking_p2: { p1: 75, p2: 55, p3: 20 }, expanding: { p1: 90, p2: 85, p3: 70 } },
+        phaseDeliverables: {
+          p1: 'Estudio de cribado preliminar de zonas con exclusión por fallas geológicas activas, volcanes e inundaciones.',
+          p2: 'Caracterización geotécnica, sismotectónica y meteorológica profunda del sitio candidato final.',
+          p3: 'Infraestructura de soporte construida: muelles de descarga pesada, carreteras y campamentos.'
+        },
+        criticalGaps: 'Complejidad geotécnica y tectónica en zonas de alta sismicidad regional.',
+        risks: 'Descubrimiento tardío de fallas geológicas que invaliden el sitio tras inversiones millonarias.',
+        smrImpact: 'Opciones de refrigeración seca por aire y posibilidad de reconvertir antiguas plantas de carbón (repowering).'
+      },
+      {
+        id: 13, code: '13', cat: 'safety', weight: 7,
+        name: { es: 'Protección Ambiental', en: 'Environmental Protection' },
+        refOIEA: 'GSG-10 / Safety Standards',
+        crChapter: 'Capítulo 13: Evaluación de Impacto Ambiental y Biodiversidad',
+        scores: { colombia: { p1: 35, p2: 10, p3: 0 }, embarking_p1: { p1: 30, p2: 10, p3: 0 }, embarking_p2: { p1: 80, p2: 60, p3: 20 }, expanding: { p1: 95, p2: 85, p3: 75 } },
+        phaseDeliverables: {
+          p1: 'Estudio de línea base ambiental preliminar y términos de referencia para la Evaluación de Impacto Ambiental (EIA).',
+          p2: 'Licencia ambiental formal otorgada por la autoridad ambiental con plan de compensación de biodiversidad.',
+          p3: 'Programa de vigilancia ecológica continua de efluentes térmicos y radiológicos en operación.'
+        },
+        criticalGaps: 'Tiempos prolongados e incertidumbre jurídica en trámites de licenciamiento ambiental.',
+        risks: 'Demandas constitucionales o medidas cautelares por afectación a ecosistemas frágiles.',
+        smrImpact: 'Huella territorial reducida (hasta 90% menor que una central nuclear tradicional).'
+      },
+      {
+        id: 14, code: '14', cat: 'safety', weight: 7,
+        name: { es: 'Planificación de Emergencias (EP&R)', en: 'Emergency Planning & Response' },
+        refOIEA: 'GSR Part 7 / GS-G-2.1',
+        crChapter: 'Capítulo 14: Gestión del Riesgo y Capacidad de Respuesta Radiológica',
+        scores: { colombia: { p1: 30, p2: 10, p3: 0 }, embarking_p1: { p1: 30, p2: 10, p3: 0 }, embarking_p2: { p1: 75, p2: 55, p3: 20 }, expanding: { p1: 90, p2: 85, p3: 75 } },
+        phaseDeliverables: {
+          p1: 'Evaluación del Sistema Nacional de Gestión del Riesgo para emergencias radiológicas de categoría I.',
+          p2: 'Plan Nacional de Emergencia Radiológica y delimitación de zonas EPZ (PAZ, UPZ, EPDZ).',
+          p3: 'Centro de operaciones de emergencia en sitio (EOF) y simulacros interinstitucionales certificados.'
+        },
+        criticalGaps: 'Falta de protocolos integrados entre organismos de socorro civiles y los entes de seguridad nuclear.',
+        risks: 'Falta de preparación comunitaria ante un incidente que desate pánico masivo.',
+        smrImpact: 'Zona de Planificación de Emergencia (EPZ) confinada al perímetro de la instalación (boundary limit).'
+      },
+      {
+        id: 15, code: '15', cat: 'security', weight: 7,
+        name: { es: 'Seguridad Física Nuclear', en: 'Nuclear Security' },
+        refOIEA: 'NSS No. 13 / NSS No. 20',
+        crChapter: 'Capítulo 15: Protección Física de Instalaciones y Ciberseguridad',
+        scores: { colombia: { p1: 40, p2: 15, p3: 0 }, embarking_p1: { p1: 35, p2: 15, p3: 0 }, embarking_p2: { p1: 80, p2: 60, p3: 25 }, expanding: { p1: 95, p2: 90, p3: 80 } },
+        phaseDeliverables: {
+          p1: 'Definición de la Amenaza Base de Diseño (DBT) preliminar y evaluación del contexto de seguridad nacional.',
+          p2: 'Estructura de defensa en profundidad (barreras físicas, control de acceso, ciberseguridad I&C).',
+          p3: 'Fuerza de respuesta armada especializada desplegada con interoperabilidad de defensa del Estado.'
+        },
+        criticalGaps: 'Amenazas asimétricas, orden público en zonas remotas y ciberataques a sistemas industriales (SCADA).',
+        risks: 'Sabotaje o intento de intrusión a la instalación o durante el transporte de combustible.',
+        smrImpact: 'Diseños semienterrados o subterráneos ofrecen una resistencia intrínseca superior ante ataques físicos.'
+      },
+      {
+        id: 16, code: '16', cat: 'technical', weight: 6,
+        name: { es: 'Ciclo del Combustible Nuclear', en: 'Nuclear Fuel Cycle' },
+        refOIEA: 'NF-T Series / NG-T-3.14',
+        crChapter: 'Capítulo 16: Estrategia de Suministro de Combustible y Servicios de Enriquecimiento',
+        scores: { colombia: { p1: 20, p2: 5, p3: 0 }, embarking_p1: { p1: 20, p2: 5, p3: 0 }, embarking_p2: { p1: 70, p2: 45, p3: 15 }, expanding: { p1: 90, p2: 80, p3: 65 } },
+        phaseDeliverables: {
+          p1: 'Definición de la política del ciclo de combustible (ciclo abierto de una sola pasada vs. contratos internacionales).',
+          p2: 'Contratos comerciales garantizados de suministro de uranio enriquecido y fabricación de elementos combustibles.',
+          p3: 'Llegada y recepción del núcleo inicial de combustible en el emplazamiento bajo verificación de salvaguardias.'
+        },
+        criticalGaps: 'Dependencia 100% externa del mercado internacional de enriquecimiento y conversión.',
+        risks: 'Vulnerabilidad geopolítica en la cadena internacional de suministro de uranio enriquecido.',
+        smrImpact: 'Opciones de contrato tipo "Fuel-as-a-Service" donde el fabricante suministra y retira el combustible gastado.'
+      },
+      {
+        id: 17, code: '17', cat: 'safety', weight: 8,
+        name: { es: 'Desechos Radiactivos y Combustible Gastado', en: 'Radioactive Waste & Spent Fuel' },
+        refOIEA: 'GSR Part 5 / NW-G-1.1',
+        crChapter: 'Capítulo 17: Estrategia Nacional de Gestión de Desechos y Desmantelamiento',
+        scores: { colombia: { p1: 25, p2: 10, p3: 0 }, embarking_p1: { p1: 20, p2: 10, p3: 0 }, embarking_p2: { p1: 75, p2: 50, p3: 20 }, expanding: { p1: 90, p2: 85, p3: 75 } },
+        phaseDeliverables: {
+          p1: 'Política nacional de gestión de residuos de baja, media y alta actividad, y principio "el que contamina paga".',
+          p2: 'Diseño y selección de sitio para almacenamiento temporal en seco (Dry Cask Storage) y fondo fiduciario.',
+          p3: 'Instalaciones de almacenamiento de residuos operando bajo estándares del OIEA.'
+        },
+        criticalGaps: 'Inexistencia de un repositorio centralizado de residuos ni de un fondo financiero de desmantelamiento.',
+        risks: 'Crisis de legitimidad pública si no se presenta una solución creíble para el combustible gastado.',
+        smrImpact: 'Menor volumen absoluto de residuos generados y ciclos prolongados entre recargas.'
+      },
+      {
+        id: 18, code: '18', cat: 'human', weight: 6,
+        name: { es: 'Participación Industrial Nacional', en: 'Industrial Involvement' },
+        refOIEA: 'NG-T-3.4 / NP-T-3.19',
+        crChapter: 'Capítulo 18: Cadena de Valor Industrial Local y Transferencia Tecnológica',
+        scores: { colombia: { p1: 20, p2: 5, p3: 0 }, embarking_p1: { p1: 20, p2: 5, p3: 0 }, embarking_p2: { p1: 70, p2: 45, p3: 15 }, expanding: { p1: 85, p2: 80, p3: 65 } },
+        phaseDeliverables: {
+          p1: 'Estudio de capacidades de la industria metalmecánica, civil y eléctrica nacional para participar como proveedores.',
+          p2: 'Plan de cualificación y certificación de normas de calidad nuclear (ASME N-Stamp, ISO 19443) para empresas locales.',
+          p3: 'Participación efectiva de la industria nacional en obras civiles, montajes electromecánicos y mantenimiento.'
+        },
+        criticalGaps: 'La industria local suele carecer de certificaciones de calidad nuclear y experiencia en tolerancias de alta exigencia.',
+        risks: 'Bajo contenido local que reduzca los beneficios socioeconómicos esperados por el país.',
+        smrImpact: 'Permite a empresas locales participar en componentes estandarizados no nucleares (Balance of Plant - BOP).'
+      },
+      {
+        id: 19, code: '19', cat: 'governance', weight: 7,
+        name: { es: 'Adquisiciones y Cadena de Suministro', en: 'Procurement' },
+        refOIEA: 'NG-T-3.9 / SSG-16',
+        crChapter: 'Capítulo 19: Modalidad de Contratación y Gestión de Adquisiciones',
+        scores: { colombia: { p1: 15, p2: 5, p3: 0 }, embarking_p1: { p1: 15, p2: 5, p3: 0 }, embarking_p2: { p1: 75, p2: 50, p3: 15 }, expanding: { p1: 90, p2: 85, p3: 70 } },
+        phaseDeliverables: {
+          p1: 'Definición del modelo de contratación internacional (EPC Llave en Mano, Contratos Divididos, Alianzas Público-Privadas).',
+          p2: 'Pliego de licitación internacional (RFP), evaluación técnica y negociación contractual del reactor.',
+          p3: 'Inspección de calidad en fábricas internacionales de componentes de largo plazo de entrega (Long-lead items).'
+        },
+        criticalGaps: 'Falta de experiencia en contratos internacionales de ingeniería nuclear y cláusulas de responsabilidad.',
+        risks: 'Sobrecostos y litigios contractuales multimillonarios por indefinición de alcances.',
+        smrImpact: 'Compras tipo catálogo modular con estándares de fabricación en serie garantizados por el fabricante.'
+      }
+    ];
+
+    // ESTADO GLOBAL REACTIVO
+    let currentLang = 'es';
+    let currentCountry = 'colombia';
+    let currentTech = 'smr';
+    let currentPhase = 1;
+    let currentTab = 'radar';
+    let selectedIssueId = 1;
+    let whatIfDelay = 0;
+
+    // Puntajes de autodiagnóstico personalizados para Modo INIR
+    let customScores = {};
+    INFRASTRUCTURE_ISSUES.forEach(i => {
+      customScores[i.id] = { p1: 35, p2: 15, p3: 0 };
+    });
+
+    function getIssueScore(item, phase) {
+      if (currentCountry === 'custom') {
+        return customScores[item.id]['p' + phase] || 30;
+      }
+      const pScores = item.scores[currentCountry] || item.scores.embarking_p1;
+      return pScores['p' + phase] !== undefined ? pScores['p' + phase] : 25;
+    }
+
+    function calculateOverallReadiness() {
+      let totalWeight = 0;
+      let weightedSum = 0;
+      INFRASTRUCTURE_ISSUES.forEach(i => {
+        totalWeight += i.weight;
+        weightedSum += getIssueScore(i, currentPhase) * i.weight;
+      });
+      return Math.round(weightedSum / totalWeight);
+    }
+
+    function renderRadarSVG() {
+      const svg = document.getElementById('radar-svg');
+      if (!svg) return;
+      svg.innerHTML = '';
+
+      const total = INFRASTRUCTURE_ISSUES.length;
+      const center = 170;
+      const maxRadius = 120;
+
+      // Círculos concéntricos de referencia (25%, 50%, 75%, 100%)
+      [0.25, 0.5, 0.75, 1.0].forEach((lvl) => {
+        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle.setAttribute('cx', center);
+        circle.setAttribute('cy', center);
+        circle.setAttribute('r', maxRadius * lvl);
+        circle.setAttribute('fill', 'none');
+        circle.setAttribute('stroke', '#334155');
+        circle.setAttribute('stroke-dasharray', lvl === 1.0 ? 'none' : '3 3');
+        circle.setAttribute('stroke-width', lvl === 1.0 ? '1.5' : '0.7');
+        svg.appendChild(circle);
+      });
+
+      // Ejes radiales
+      INFRASTRUCTURE_ISSUES.forEach((item, index) => {
+        const angle = (Math.PI * 2 / total) * index - Math.PI / 2;
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', center);
+        line.setAttribute('y1', center);
+        line.setAttribute('x2', center + maxRadius * Math.cos(angle));
+        line.setAttribute('y2', center + maxRadius * Math.sin(angle));
+        line.setAttribute('stroke', '#1e293b');
+        line.setAttribute('stroke-width', '1');
+        svg.appendChild(line);
+      });
+
+      // Puntos del polígono de madurez
+      let pointsStr = '';
+      const pointObjects = [];
+
+      INFRASTRUCTURE_ISSUES.forEach((item, index) => {
+        const angle = (Math.PI * 2 / total) * index - Math.PI / 2;
+        const score = getIssueScore(item, currentPhase);
+        const r = (score / 100) * maxRadius;
+        const x = center + r * Math.cos(angle);
+        const y = center + r * Math.sin(angle);
+        const labelX = center + (maxRadius + 22) * Math.cos(angle);
+        const labelY = center + (maxRadius + 22) * Math.sin(angle);
+
+        pointsStr += `${x},${y} `;
+        pointObjects.push({ item, score, x, y, labelX, labelY });
+      });
+
+      // Definición de gradiente SVG
+      const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+      defs.innerHTML = `
+        <radialGradient id="radarGrad" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.65" />
+          <stop offset="100%" stop-color="#3b82f6" stop-opacity="0.15" />
+        </radialGradient>
+      `;
+      svg.appendChild(defs);
+
+      // Polígono del radar
+      const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+      polygon.setAttribute('points', pointsStr.trim());
+      polygon.setAttribute('fill', 'url(#radarGrad)');
+      polygon.setAttribute('stroke', '#06b6d4');
+      polygon.setAttribute('stroke-width', '2.5');
+      polygon.setAttribute('class', 'transition-all duration-500');
+      svg.appendChild(polygon);
+
+      // Nodos interactivos y etiquetas de código (#01 - #19)
+      pointObjects.forEach(pt => {
+        const isSelected = selectedIssueId === pt.item.id;
+        const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        g.setAttribute('class', 'cursor-pointer group');
+        g.onclick = () => selectIssue(pt.item.id);
+
+        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle.setAttribute('cx', pt.x);
+        circle.setAttribute('cy', pt.y);
+        circle.setAttribute('r', isSelected ? '7' : '4.5');
+        circle.setAttribute('fill', isSelected ? '#f59e0b' : '#38bdf8');
+        circle.setAttribute('stroke', '#0f172a');
+        circle.setAttribute('stroke-width', '2');
+        circle.setAttribute('class', 'transition-transform duration-200 group-hover:scale-150');
+
+        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        text.setAttribute('x', pt.labelX);
+        text.setAttribute('y', pt.labelY);
+        text.setAttribute('font-size', '8.5');
+        text.setAttribute('font-weight', isSelected ? 'bold' : 'normal');
+        text.setAttribute('fill', isSelected ? '#f59e0b' : '#94a3b8');
+        text.setAttribute('text-anchor', 'middle');
+        text.setAttribute('dominant-baseline', 'central');
+        text.textContent = pt.item.code;
+
+        g.appendChild(circle);
+        g.appendChild(text);
+        svg.appendChild(g);
+      });
+    }
+
+    function selectIssue(id) {
+      selectedIssueId = id;
+      updateUI();
+    }
+
+    function setPhase(p) {
+      currentPhase = p;
+      [1, 2, 3].forEach(idx => {
+        const card = document.getElementById('phase-card-' + idx);
+        if (idx === p) {
+          card.className = "phase-card text-left p-3.5 rounded-2xl border transition-all relative overflow-hidden bg-gradient-to-r from-cyan-500/20 to-blue-500/10 border-cyan-500/50 text-cyan-300 ring-2 ring-cyan-400/50 shadow-lg";
+        } else {
+          card.className = "phase-card text-left p-3.5 rounded-2xl border transition-all relative overflow-hidden bg-slate-950/50 border-slate-800 hover:bg-slate-800/40 text-slate-400";
+        }
+      });
+      updateUI();
+    }
+
+    function setTab(tabKey) {
+      currentTab = tabKey;
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
+      const activeP = document.getElementById('panel-' + tabKey);
+      if (activeP) activeP.classList.remove('hidden');
+
+      document.querySelectorAll('.tab-btn').forEach(b => {
+        b.className = "tab-btn px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-2xl text-xs sm:text-sm font-bold transition flex items-center gap-1.5 bg-slate-900/80 hover:bg-slate-800 text-slate-400 border border-slate-800";
+      });
+      const activeB = document.getElementById('tab-btn-' + tabKey);
+      if (activeB) {
+        activeB.className = "tab-btn px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-2xl text-xs sm:text-sm font-bold transition flex items-center gap-1.5 bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/25 border border-cyan-400/40";
+      }
+
+      if (tabKey === 'radar') renderRadarSVG();
+      if (tabKey === 'roadmap') renderRoadmapTimeline();
+      if (tabKey === 'inir') renderInirSliders();
+    }
+
+    function updateDelay(val) {
+      whatIfDelay = parseInt(val) || 0;
+      document.getElementById('delay-value-txt').textContent = `+${whatIfDelay} m`;
+      renderRoadmapTimeline();
+    }
+
+    function renderRoadmapTimeline() {
+      const cont = document.getElementById('roadmap-timeline-container');
+      if (!cont) return;
+
+      const steps = [
+        { phase: 'Fase 1', code: 'P1', title: 'Estudios de Viabilidad & Comprehensive Report (NEPIO)', baseDuration: 36, delay: 0 },
+        { phase: 'Hito 1', code: 'M1', title: 'Decisión Soberana & Promulgación de Ley Nuclear', baseDuration: 18, delay: whatIfDelay },
+        { phase: 'Fase 2', code: 'P2', title: 'Creación del Regulador, Caracterización de Sitio & Licitación', baseDuration: 48, delay: Math.round(whatIfDelay * 0.7) },
+        { phase: 'Hito 2', code: 'M2', title: 'Firma de Contrato EPC / PPA con Proveedor', baseDuration: 12, delay: 0 },
+        { phase: 'Fase 3', code: 'P3', title: 'Construcción, Ensayos Preoperacionales & Carga de Combustible', baseDuration: currentTech === 'smr' ? 42 : 84, delay: 0 }
+      ];
+
+      cont.innerHTML = steps.map(s => {
+        const total = s.baseDuration + s.delay;
+        return `
+          <div class="bg-slate-950/70 p-3.5 rounded-2xl border border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <span class="px-2.5 py-1 rounded-lg bg-slate-800 text-xs font-mono font-bold text-slate-300">${s.code}</span>
+              <div>
+                <div class="text-xs text-slate-400 font-semibold uppercase">${s.phase}</div>
+                <div class="text-sm font-bold text-slate-200">${s.title}</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-4 text-xs">
+              <div class="text-slate-400">Plazo estimado: <strong class="text-white font-mono text-sm">${total} meses</strong></div>
+              ${s.delay > 0 ? `<span class="px-2.5 py-0.5 rounded-full bg-rose-500/20 text-rose-300 font-bold border border-rose-500/30 animate-pulse">+${s.delay}m Retraso</span>` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderInirSliders() {
+      const grid = document.getElementById('inir-sliders-grid');
+      if (!grid) return;
+
+      grid.innerHTML = INFRASTRUCTURE_ISSUES.map(issue => {
+        const score = getIssueScore(issue, currentPhase);
+        const statusClass = score < 35 ? 'bg-rose-500/20 text-rose-300 border-rose-500/40' : (score < 70 ? 'bg-amber-500/20 text-amber-300 border-amber-500/40' : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40');
+        const statusLabel = score < 35 ? 'Requiere Acción' : (score < 70 ? 'En Progreso' : 'Adecuado Hito');
+
+        return `
+          <div class="bg-slate-950/70 border border-slate-800 rounded-2xl p-4 flex flex-col justify-between hover:border-slate-700 transition">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-mono font-bold px-2 py-0.5 rounded bg-slate-800 text-cyan-400">#${issue.code}</span>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full border ${statusClass}">${statusLabel}</span>
+              </div>
+              <h4 class="text-xs font-bold text-slate-100 truncate">${issue.name[currentLang]}</h4>
+              <span class="text-[10px] text-slate-400 font-mono block mt-0.5">${issue.refOIEA}</span>
+            </div>
+
+            <div class="mt-3 pt-2 border-t border-slate-800">
+              <div class="flex items-center justify-between text-xs mb-1">
+                <span class="text-slate-400">Madurez Fase ${currentPhase}:</span>
+                <span class="font-mono font-bold text-white" id="slider-txt-${issue.id}">${score}%</span>
+              </div>
+              <input type="range" min="0" max="100" step="5" value="${score}"
+                oninput="onInirChange(${issue.id}, this.value)"
+                class="w-full accent-cyan-400 cursor-pointer h-1.5 bg-slate-800 rounded-lg">
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function onInirChange(issueId, value) {
+      const val = parseInt(value) || 0;
+      customScores[issueId]['p' + currentPhase] = val;
+      document.getElementById('slider-txt-' + issueId).textContent = val + '%';
+      currentCountry = 'custom';
+      document.getElementById('country-select').value = 'custom';
+      updateUI();
+    }
+
+    function loadSampleScenario() {
+      INFRASTRUCTURE_ISSUES.forEach(i => {
+        customScores[i.id] = { p1: 65, p2: 30, p3: 10 };
+      });
+      currentCountry = 'custom';
+      document.getElementById('country-select').value = 'custom';
+      updateUI();
+      renderInirSliders();
+    }
+
+    function updateUI() {
+      const profile = COUNTRY_PROFILES[currentCountry] || COUNTRY_PROFILES.colombia;
+      const issue = INFRASTRUCTURE_ISSUES.find(i => i.id === selectedIssueId) || INFRASTRUCTURE_ISSUES[0];
+      const readiness = calculateOverallReadiness();
+
+      // Madurez General
+      document.getElementById('overall-bar').style.width = readiness + '%';
+      document.getElementById('overall-score-txt').textContent = readiness + '%';
+      document.getElementById('radar-phase-tag').textContent = 'Fase ' + currentPhase;
+
+      // Ficha Diagnóstica Activa
+      document.getElementById('card-issue-code').textContent = 'Issue #' + issue.code;
+      document.getElementById('card-issue-name').textContent = issue.name[currentLang];
+      document.getElementById('card-issue-ref').textContent = issue.refOIEA;
+      document.getElementById('card-issue-score').textContent = getIssueScore(issue, currentPhase) + '%';
+      document.getElementById('card-issue-roles').innerHTML = `
+        <span>• <strong>Gobierno / NEPIO:</strong> ${profile.roles.gov}</span><br>
+        <span>• <strong>Regulador:</strong> ${profile.roles.reg}</span><br>
+        <span>• <strong>Operador:</strong> ${profile.roles.op}</span>
+      `;
+      document.getElementById('card-issue-deliverable').textContent = issue.phaseDeliverables['p' + currentPhase];
+      document.getElementById('card-issue-gap').textContent = issue.criticalGaps;
+      document.getElementById('card-issue-smr').textContent = issue.smrImpact;
+
+      // Botones rápidos de los 19 aspectos
+      const btnCont = document.getElementById('quick-buttons-container');
+      if (btnCont && btnCont.children.length === 0) {
+        btnCont.innerHTML = INFRASTRUCTURE_ISSUES.map(item => `
+          <button onclick="selectIssue(${item.id})" id="quick-btn-${item.id}"
+            class="px-2.5 py-1 rounded-xl text-xs font-mono transition ${selectedIssueId === item.id ? 'bg-cyan-500 text-slate-950 font-black' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'}">
+            #${item.code} ${item.name.es.split(' ')[0]}
+          </button>
+        `).join('');
+      } else if (btnCont) {
+        INFRASTRUCTURE_ISSUES.forEach(item => {
+          const b = document.getElementById('quick-btn-' + item.id);
+          if (b) {
+            b.className = `px-2.5 py-1 rounded-xl text-xs font-mono transition ${selectedIssueId === item.id ? 'bg-cyan-500 text-slate-950 font-black' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'}`;
+          }
+        });
+      }
+
+      // Gobernanza Roles
+      document.getElementById('roadmap-gov-role').textContent = profile.roles.gov;
+      document.getElementById('roadmap-reg-role').textContent = profile.roles.reg;
+      document.getElementById('roadmap-op-role').textContent = profile.roles.op;
+
+      // Comprehensive Report Studio
+      document.getElementById('cr-chapter-name').textContent = issue.crChapter;
+      document.getElementById('cr-box-title').innerHTML = `<span>📋</span> Contenido Exigido por OIEA para el Issue #${issue.code}: ${issue.name[currentLang]}`;
+      document.getElementById('cr-box-ref').textContent = issue.refOIEA;
+      document.getElementById('cr-sec-1').textContent = `${profile.name[currentLang]}: La gobernanza recae en ${profile.roles.gov}. Se debe formalizar la línea base técnica y jurídica.`;
+      document.getElementById('cr-sec-2').textContent = issue.phaseDeliverables.p1;
+      document.getElementById('cr-sec-3').textContent = issue.risks;
+      document.getElementById('cr-sec-4').textContent = issue.phaseDeliverables.p2;
+
+      // Simulador Decisión
+      document.getElementById('sim-country-name').textContent = profile.name[currentLang];
+      document.getElementById('sim-phase-tag').textContent = 'Fase ' + currentPhase;
+      document.getElementById('sim-milestone-status').textContent = readiness < 50 ? 'En Formulación (Estudios Iniciales)' : 'Maduro para Decisión Gubernamental';
+      document.getElementById('sim-tech-status').textContent = currentTech === 'smr' ? 'SMR (Reactores Modulares Pequeños)' : 'Gran Escala (1000+ MWe)';
+      document.getElementById('sim-time-status').textContent = currentPhase === 1 ? '18 a 36 meses' : (currentPhase === 2 ? '36 a 60 meses' : '48 a 72 meses');
+
+      // Re-dibujar gráficos si están visibles
+      if (currentTab === 'radar') renderRadarSVG();
+    }
+
+    // Inicialización al cargar el DOM
+    window.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('country-select').addEventListener('change', (e) => {
+        currentCountry = e.target.value;
+        updateUI();
+      });
+
+      document.getElementById('btn-tech-smr').addEventListener('click', () => {
+        currentTech = 'smr';
+        document.getElementById('btn-tech-smr').className = 'px-3 py-1.5 rounded-xl text-xs font-bold bg-indigo-600 text-white shadow transition';
+        document.getElementById('btn-tech-gw').className = 'px-3 py-1.5 rounded-xl text-xs font-medium text-slate-400 hover:text-white transition';
+        updateUI();
+        renderRoadmapTimeline();
+      });
+
+      document.getElementById('btn-tech-gw').addEventListener('click', () => {
+        currentTech = 'gw';
+        document.getElementById('btn-tech-gw').className = 'px-3 py-1.5 rounded-xl text-xs font-bold bg-indigo-600 text-white shadow transition';
+        document.getElementById('btn-tech-smr').className = 'px-3 py-1.5 rounded-xl text-xs font-medium text-slate-400 hover:text-white transition';
+        updateUI();
+        renderRoadmapTimeline();
+      });
+
+      document.getElementById('btn-lang').addEventListener('click', () => {
+        currentLang = currentLang === 'es' ? 'en' : 'es';
+        document.getElementById('btn-lang').textContent = '🌐 ' + currentLang.toUpperCase();
+        updateUI();
+      });
+
+      setPhase(1);
+      setTab('radar');
+      updateUI();
+    });
+  </script>
+</body>
+</html>
