@@ -1,0 +1,8 @@
+{
+  "name": "Nuclear Decision Cockpit",
+  "description": "Suite de Autodiagnóstico Soberano y Orientación Estratégica en los 19 Aspectos de Infraestructura Nuclear del OIEA.",
+  "permissions": [],
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

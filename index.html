@@ -4,9 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
   <title>Nuclear Decision Cockpit - Plataforma Integral OIEA</title>
+  <meta name="description" content="Suite de Autodiagnóstico Soberano y Orientación Estratégica en los 19 Aspectos de Infraestructura Nuclear del OIEA.">
+  <meta property="og:title" content="Nuclear Decision Cockpit - Plataforma Integral OIEA">
+  <meta property="og:description" content="Suite de Autodiagnóstico Soberano y Orientación Estratégica en los 19 Aspectos de Infraestructura Nuclear del OIEA.">
   
   <!-- Tailwind CSS CDN para renderizado instantáneo y responsivo -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="i18n.js"></script>
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -188,7 +192,7 @@
 
       <!-- Indicador Global de Madurez (Ponderado) -->
       <div class="bg-slate-900/90 border border-slate-800 px-4 py-2 rounded-2xl flex items-center gap-3 shadow-md">
-        <span class="text-xs text-slate-400">Madurez Fase Activa:</span>
+        <span id="overall-label" class="text-xs text-slate-400">Madurez Fase Activa:</span>
         <div class="w-20 sm:w-28 bg-slate-950 h-2.5 rounded-full overflow-hidden border border-slate-800 p-0.5">
           <div id="overall-bar" class="h-full bg-gradient-to-r from-amber-500 via-cyan-400 to-emerald-400 rounded-full transition-all duration-500" style="width: 35%;"></div>
         </div>
@@ -204,10 +208,10 @@
       <div class="lg:col-span-6 bg-slate-900/80 border border-slate-800 rounded-3xl p-4 sm:p-5 shadow-xl flex flex-col items-center justify-between">
         <div class="w-full flex items-center justify-between mb-1">
           <div>
-            <h2 class="text-sm sm:text-base font-bold text-white flex items-center gap-2">
+            <h2 id="radar-title" class="text-sm sm:text-base font-bold text-white flex items-center gap-2">
               <span class="text-cyan-400">●</span> Radar de Infraestructura Nuclear (19 Aspectos)
             </h2>
-            <p class="text-xs text-slate-400">Toca cualquier nodo o botón para inspeccionar brechas</p>
+            <p id="radar-subtitle" class="text-xs text-slate-400">Toca cualquier nodo o botón para inspeccionar brechas</p>
           </div>
           <span id="radar-phase-tag" class="text-xs px-2.5 py-1 rounded-xl bg-slate-800 text-cyan-300 font-mono font-bold">Fase 1</span>
         </div>
@@ -217,7 +221,7 @@
         </div>
 
         <!-- Leyenda de Pilares OIEA -->
-        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 w-full pt-3 border-t border-slate-800 text-[11px]">
+        <div id="radar-legend" class="grid grid-cols-2 sm:grid-cols-3 gap-2 w-full pt-3 border-t border-slate-800 text-[11px]">
           <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded bg-cyan-400"></span><span class="text-slate-300 truncate">Gobernanza & NEPIO</span></div>
           <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded bg-emerald-400"></span><span class="text-slate-300 truncate">Seguridad & Ambiente</span></div>
           <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded bg-indigo-400"></span><span class="text-slate-300 truncate">Legal & Regulatorio</span></div>
@@ -241,38 +245,193 @@
               <span id="card-issue-ref" class="text-xs text-slate-400 font-mono">NG-G-3.1 Rev. 2 / NG-T-3.14</span>
             </div>
             <div class="text-right">
-              <span class="text-xs text-slate-400 block">Madurez</span>
+              <span id="card-score-label" class="text-xs text-slate-400 block">Madurez</span>
               <span id="card-issue-score" class="text-2xl font-black text-amber-400">45%</span>
+            </div>
+          </div>
+
+          <!-- =========================================================================
+              CONSOLA INTERACTIVA DE EVALUACIÓN Y DATOS DE ENTRADA (MÓDULO A)
+          ========================================================================= -->
+          <div id="eval-console-card" class="mt-4 p-4 rounded-2xl bg-gradient-to-b from-slate-950/95 to-slate-900/90 border border-cyan-500/30 shadow-inner space-y-3">
+            <!-- Barra superior: Selector de Fase a Evaluar + Estado de Brecha -->
+            <div class="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-slate-800/80">
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+                <span id="eval-card-title" class="text-xs font-bold text-white uppercase tracking-wider">
+                  Consola de Evaluación & Ejecución
+                </span>
+              </div>
+              
+              <!-- Selector de Fase para Evaluar -->
+              <div class="flex items-center gap-1 bg-slate-900 p-1 rounded-xl border border-slate-800 text-[11px] font-bold">
+                <span id="eval-phase-label" class="text-slate-400 px-1 text-[10px]">Evaluar:</span>
+                <button type="button" onclick="setPhase(1)" id="eval-phase-btn-1" class="px-2 py-0.5 rounded-lg transition text-cyan-300 bg-cyan-500/20 border border-cyan-500/40">Fase 1</button>
+                <button type="button" onclick="setPhase(2)" id="eval-phase-btn-2" class="px-2 py-0.5 rounded-lg transition text-slate-400 hover:text-white">Fase 2</button>
+                <button type="button" onclick="setPhase(3)" id="eval-phase-btn-3" class="px-2 py-0.5 rounded-lg transition text-slate-400 hover:text-white">Fase 3</button>
+              </div>
+            </div>
+
+            <!-- Indicador de Madurez + Brecha vs Meta 70% OIEA -->
+            <div>
+              <div class="flex items-center justify-between text-xs mb-1">
+                <div class="flex items-center gap-2">
+                  <span id="eval-slider-label" class="text-slate-300 font-semibold">Nivel de Ejecución / Madurez:</span>
+                  <span id="eval-target-badge" class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                    Brecha: -25% para Hito (70%)
+                  </span>
+                </div>
+                <div class="flex items-center gap-1">
+                  <span class="text-slate-400 text-[11px]">Meta OIEA:</span>
+                  <span class="text-cyan-400 font-mono font-bold text-xs">70%</span>
+                </div>
+              </div>
+
+              <!-- Barra de Progreso con Marca de Meta al 70% -->
+              <div class="relative w-full h-3 bg-slate-900 rounded-full overflow-hidden border border-slate-800 p-0.5">
+                <div id="eval-progress-bar" class="h-full rounded-full transition-all duration-300 bg-gradient-to-r from-amber-500 to-cyan-400" style="width: 45%;"></div>
+                <!-- Línea de Meta 70% -->
+                <div class="absolute top-0 bottom-0 left-[70%] w-0.5 bg-emerald-400/80 shadow-[0_0_8px_rgba(16,185,129,0.8)] z-10" title="Meta de Cumplimiento OIEA (70%)"></div>
+              </div>
+            </div>
+
+            <!-- Controles de Entrada (Slider + Steppers Numéricos) -->
+            <div class="bg-slate-900/90 p-3 rounded-xl border border-slate-800/80 space-y-2.5">
+              <div class="flex items-center justify-between gap-3">
+                <!-- Slider de Entrada -->
+                <div class="flex-1">
+                  <input type="range" id="issue-eval-slider" min="0" max="100" step="1" value="45"
+                    oninput="onIssueScoreInput(this.value)"
+                    class="w-full accent-cyan-400 cursor-pointer h-2 bg-slate-800 rounded-lg">
+                  <div class="flex justify-between text-[9px] text-slate-500 font-mono mt-1 px-0.5">
+                    <span>0%</span>
+                    <span>25%</span>
+                    <span>50%</span>
+                    <span class="text-emerald-400 font-bold">70% (Meta)</span>
+                    <span>100%</span>
+                  </div>
+                </div>
+
+                <!-- Input Numérico Directo y Steppers -->
+                <div class="flex items-center gap-1 bg-slate-950 p-1.5 rounded-xl border border-slate-700/80">
+                  <button type="button" onclick="adjustCurrentScore(-5)" class="w-6 h-6 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-black transition flex items-center justify-center">-5</button>
+                  <div class="flex items-center">
+                    <input type="number" id="issue-eval-number" min="0" max="100" value="45"
+                      onchange="onIssueScoreInput(this.value)"
+                      class="w-12 bg-transparent text-center font-mono font-black text-sm text-cyan-300 outline-none border-none">
+                    <span class="text-xs font-mono font-bold text-slate-400 pr-1">%</span>
+                  </div>
+                  <button type="button" onclick="adjustCurrentScore(5)" class="w-6 h-6 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-black transition flex items-center justify-center">+5</button>
+                </div>
+              </div>
+
+              <!-- Botones de Salto Rápido / Presets OIEA -->
+              <div class="flex flex-wrap items-center justify-between gap-1.5 pt-1 text-[10px]">
+                <span id="eval-presets-label" class="text-slate-400 text-[10px]">Ajuste rápido:</span>
+                <div class="flex flex-wrap items-center gap-1">
+                  <button type="button" onclick="onIssueScoreInput(0)" class="px-2 py-0.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-mono transition">0%</button>
+                  <button type="button" onclick="onIssueScoreInput(25)" class="px-2 py-0.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-mono transition">25%</button>
+                  <button type="button" onclick="onIssueScoreInput(50)" class="px-2 py-0.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-mono transition">50%</button>
+                  <button type="button" onclick="onIssueScoreInput(70)" class="px-2 py-0.5 rounded-lg bg-emerald-950/80 text-emerald-300 border border-emerald-600/40 hover:bg-emerald-900/60 font-mono font-bold transition">70% Meta</button>
+                  <button type="button" onclick="onIssueScoreInput(100)" class="px-2 py-0.5 rounded-lg bg-cyan-950/80 text-cyan-300 border border-cyan-600/40 hover:bg-cyan-900/60 font-mono font-bold transition">100%</button>
+                  <button type="button" onclick="resetCurrentIssueScore()" id="eval-reset-btn" class="px-2 py-0.5 rounded-lg bg-slate-800 hover:bg-rose-900/40 text-slate-400 hover:text-rose-300 transition" title="Restablecer al valor base del país">↺ Base</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Criterios de Evaluación Mandatorios del OIEA (Checklist de Hitos) -->
+            <div class="bg-slate-950/60 p-3 rounded-xl border border-slate-800/80 space-y-2">
+              <div class="flex items-center justify-between">
+                <span id="eval-checklist-title" class="text-[11px] font-bold text-slate-300 flex items-center gap-1.5">
+                  <span>📋</span> Criterios Clave OIEA para el Hito:
+                </span>
+                <span id="eval-checklist-status" class="text-[10px] font-mono text-cyan-400 font-semibold">2 de 4 cumplidos</span>
+              </div>
+              <div class="space-y-1.5 text-xs" id="eval-checklist-container">
+                <label class="flex items-start gap-2 cursor-pointer group">
+                  <input type="checkbox" id="eval-chk-1" onchange="onChecklistChange(1, this.checked)" class="mt-0.5 rounded accent-cyan-400 cursor-pointer eval-check-input">
+                  <span id="eval-chk-1-txt" class="text-slate-300 group-hover:text-white transition leading-tight text-[11px]">1. Diagnóstico de línea base y conformación de equipo técnico (+25%)</span>
+                </label>
+                <label class="flex items-start gap-2 cursor-pointer group">
+                  <input type="checkbox" id="eval-chk-2" onchange="onChecklistChange(2, this.checked)" class="mt-0.5 rounded accent-cyan-400 cursor-pointer eval-check-input">
+                  <span id="eval-chk-2-txt" class="text-slate-300 group-hover:text-white transition leading-tight text-[11px]">2. Formulación de estudios de viabilidad y coordinación institucional (+25%)</span>
+                </label>
+                <label class="flex items-start gap-2 cursor-pointer group">
+                  <input type="checkbox" id="eval-chk-3" onchange="onChecklistChange(3, this.checked)" class="mt-0.5 rounded accent-cyan-400 cursor-pointer eval-check-input">
+                  <span id="eval-chk-3-txt" class="text-slate-300 group-hover:text-white transition leading-tight text-[11px]">3. Consulta a partes interesadas y borrador normativo/técnico (+25%)</span>
+                </label>
+                <label class="flex items-start gap-2 cursor-pointer group">
+                  <input type="checkbox" id="eval-chk-4" onchange="onChecklistChange(4, this.checked)" class="mt-0.5 rounded accent-cyan-400 cursor-pointer eval-check-input">
+                  <span id="eval-chk-4-txt" class="text-slate-300 group-hover:text-white transition leading-tight text-[11px]">4. Aprobación oficial del entregable mandatorio del Hito (+25%)</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Tira Comparativa de las 3 Fases para este Aspecto -->
+            <div class="pt-2 border-t border-slate-800/80 flex items-center justify-between text-[11px]">
+              <span id="eval-multiphase-label" class="text-slate-400 text-[10px]">Madurez por Fases:</span>
+              <div class="flex items-center gap-2">
+                <button type="button" onclick="setPhase(1)" id="eval-badge-p1" class="px-2 py-0.5 rounded-lg border font-mono transition text-[10px]">
+                  F1: <strong id="eval-score-p1">45%</strong>
+                </button>
+                <button type="button" onclick="setPhase(2)" id="eval-badge-p2" class="px-2 py-0.5 rounded-lg border font-mono transition text-[10px]">
+                  F2: <strong id="eval-score-p2">15%</strong>
+                </button>
+                <button type="button" onclick="setPhase(3)" id="eval-badge-p3" class="px-2 py-0.5 rounded-lg border font-mono transition text-[10px]">
+                  F3: <strong id="eval-score-p3">0%</strong>
+                </button>
+              </div>
             </div>
           </div>
 
           <div class="space-y-3 mt-4 text-xs sm:text-sm">
             <div class="bg-slate-950/70 p-3 rounded-2xl border border-slate-800">
-              <div class="text-slate-400 text-[11px] font-bold uppercase tracking-wider mb-1">🏛️ Mapeo Institucional País:</div>
+              <div id="card-roles-header" class="text-slate-400 text-[11px] font-bold uppercase tracking-wider mb-1">🏛️ Mapeo Institucional País:</div>
               <div id="card-issue-roles" class="text-cyan-300 font-semibold text-xs leading-relaxed"></div>
             </div>
 
             <div class="bg-slate-950/70 p-3 rounded-2xl border border-slate-800">
-              <div class="text-slate-400 text-[11px] font-bold uppercase tracking-wider mb-1">🎯 Condición Mandatoria para el Hito:</div>
+              <div id="card-deliv-header" class="text-slate-400 text-[11px] font-bold uppercase tracking-wider mb-1">🎯 Condición Mandatoria para el Hito:</div>
               <div id="card-issue-deliverable" class="text-slate-200 text-xs leading-relaxed"></div>
             </div>
 
             <div class="bg-rose-950/30 p-3 rounded-2xl border border-rose-900/40">
-              <div class="text-rose-400 text-[11px] font-bold uppercase tracking-wider mb-1">⚠️ Brecha Crítica (Gap Analysis):</div>
+              <div id="card-gap-header" class="text-rose-400 text-[11px] font-bold uppercase tracking-wider mb-1">⚠️ Brecha Crítica (Gap Analysis):</div>
               <div id="card-issue-gap" class="text-rose-200 text-xs leading-relaxed"></div>
             </div>
 
             <div class="bg-indigo-950/30 p-3 rounded-2xl border border-indigo-900/40">
-              <div class="text-indigo-400 text-[11px] font-bold uppercase tracking-wider mb-1">💡 Ventaja con Reactores Modulares (SMR):</div>
+              <div id="card-smr-header" class="text-indigo-400 text-[11px] font-bold uppercase tracking-wider mb-1">💡 Ventaja con Reactores Modulares (SMR):</div>
               <div id="card-issue-smr" class="text-indigo-200 text-xs leading-relaxed"></div>
             </div>
           </div>
         </div>
 
-        <!-- Selector rápido de los 19 botones -->
+        <!-- Selector rápido de los 19 botones y Matriz Global -->
         <div class="bg-slate-900/80 border border-slate-800 rounded-3xl p-4 shadow-xl">
-          <div class="text-xs font-semibold text-slate-400 mb-2">Seleccionar Cuaderno Técnico (01 al 19):</div>
-          <div id="quick-buttons-container" class="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto pr-1"></div>
+          <div class="flex items-center justify-between mb-2">
+            <div id="quick-select-header" class="text-xs font-semibold text-slate-400">Seleccionar Cuaderno Técnico (01 al 19):</div>
+            <button type="button" onclick="toggleEvaluationMatrix()" id="eval-matrix-btn" class="px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-300 text-xs font-bold border border-slate-700 transition flex items-center gap-1">
+              <span>📋</span> <span id="eval-matrix-btn-text">Matriz Completa (19 Issues)</span>
+            </button>
+          </div>
+          <div id="quick-buttons-container" class="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto pr-1"></div>
+
+          <!-- Matriz de Evaluación Global Desplegable -->
+          <div id="panel-quick-matrix" class="hidden mt-4 pt-3 border-t border-slate-800 space-y-3">
+            <div class="flex items-center justify-between">
+              <div>
+                <h4 id="eval-matrix-title" class="text-xs font-bold text-white flex items-center gap-1.5">
+                  <span>📊</span> Matriz de Calibración Rápida de los 19 Aspectos
+                </h4>
+                <p id="eval-matrix-subtitle" class="text-[10px] text-slate-400">Ajusta el porcentaje de cada aspecto para la fase activa sin cambiar de pantalla</p>
+              </div>
+              <button type="button" onclick="resetAllScoresCurrentCountry()" class="text-[10px] px-2 py-0.5 rounded-lg bg-rose-950/40 text-rose-300 border border-rose-800/40 hover:bg-rose-900/60 transition">
+                ↺ Restablecer Todo
+              </button>
+            </div>
+            <div id="matrix-sliders-container" class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-60 overflow-y-auto pr-1 text-xs"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -282,10 +441,10 @@
     ========================================================================= -->
     <div id="panel-roadmap" class="tab-panel hidden space-y-6">
       <div class="bg-slate-900/80 border border-slate-800 rounded-3xl p-5 sm:p-6 shadow-xl">
-        <h2 class="text-lg font-bold text-white flex items-center gap-2 mb-1">
+        <h2 id="gov-title" class="text-lg font-bold text-white flex items-center gap-2 mb-1">
           <span>🏛️</span> Gobernanza Institucional Tripartita del OIEA (NG-T-3.6 Rev. 1)
         </h2>
-        <p class="text-xs text-slate-400 mb-4">
+        <p id="gov-subtitle" class="text-xs text-slate-400 mb-4">
           Separación canónica de funciones: Quien formula la política (NEPIO), quien regula con total independencia (Autoridad de Seguridad) y quien opera la central (Owner/Operator).
         </p>
 
@@ -293,31 +452,31 @@
           <div class="bg-slate-950/80 border-2 border-cyan-500/40 rounded-2xl p-4 flex flex-col justify-between">
             <div>
               <div class="w-10 h-10 rounded-xl bg-cyan-500/20 text-cyan-300 flex items-center justify-center font-bold text-lg mb-2">1</div>
-              <h4 class="font-bold text-cyan-300 text-sm">NEPIO (Comité Directivo)</h4>
+              <h4 id="nepio-title" class="font-bold text-cyan-300 text-sm">NEPIO (Comité Directivo)</h4>
               <p id="roadmap-gov-role" class="text-xs text-slate-300 font-semibold mt-1">MinMinas / Presidencia / UPME / DNP</p>
-              <p class="text-xs text-slate-400 mt-1">Lidera estudios de viabilidad, consenso político y formula el Comprehensive Report.</p>
+              <p id="nepio-desc" class="text-xs text-slate-400 mt-1">Lidera estudios de viabilidad, consenso político y formula el Comprehensive Report.</p>
             </div>
-            <div class="mt-3 pt-2 border-t border-slate-800 text-[11px] text-cyan-400 font-mono">Mandato: Hito 1 (Decisión Soberana)</div>
+            <div id="nepio-mandate" class="mt-3 pt-2 border-t border-slate-800 text-[11px] text-cyan-400 font-mono">Mandato: Hito 1 (Decisión Soberana)</div>
           </div>
 
           <div class="bg-slate-950/80 border-2 border-emerald-500/40 rounded-2xl p-4 flex flex-col justify-between">
             <div>
               <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-300 flex items-center justify-center font-bold text-lg mb-2">2</div>
-              <h4 class="font-bold text-emerald-300 text-sm">Órgano Regulador Independiente</h4>
+              <h4 id="reg-title" class="font-bold text-emerald-300 text-sm">Órgano Regulador Independiente</h4>
               <p id="roadmap-reg-role" class="text-xs text-slate-300 font-semibold mt-1">Subdirección de Asuntos Nucleares (a escindir)</p>
-              <p class="text-xs text-slate-400 mt-1">Sin subordinación a entes de promoción energética; autonomía presupuestal y técnica.</p>
+              <p id="reg-desc" class="text-xs text-slate-400 mt-1">Sin subordinación a entes de promoción energética; autonomía presupuestal y técnica.</p>
             </div>
-            <div class="mt-3 pt-2 border-t border-slate-800 text-[11px] text-emerald-400 font-mono">Mandato: Hito 2 (Licenciamiento)</div>
+            <div id="reg-mandate" class="mt-3 pt-2 border-t border-slate-800 text-[11px] text-emerald-400 font-mono">Mandato: Hito 2 (Licenciamiento)</div>
           </div>
 
           <div class="bg-slate-950/80 border-2 border-purple-500/40 rounded-2xl p-4 flex flex-col justify-between">
             <div>
               <div class="w-10 h-10 rounded-xl bg-purple-500/20 text-purple-300 flex items-center justify-center font-bold text-lg mb-2">3</div>
-              <h4 class="font-bold text-purple-300 text-sm">Entidad Propietaria / Operadora</h4>
+              <h4 id="op-title" class="font-bold text-purple-300 text-sm">Entidad Propietaria / Operadora</h4>
               <p id="roadmap-op-role" class="text-xs text-slate-300 font-semibold mt-1">Por designar (Empresa Pública o Mixta / Genco)</p>
-              <p class="text-xs text-slate-400 mt-1">Responsable del contrato EPC, construcción, seguridad operacional y O&M.</p>
+              <p id="op-desc" class="text-xs text-slate-400 mt-1">Responsable del contrato EPC, construcción, seguridad operacional y O&M.</p>
             </div>
-            <div class="mt-3 pt-2 border-t border-slate-800 text-[11px] text-purple-400 font-mono">Mandato: Hito 3 (Operación Segura)</div>
+            <div id="op-mandate" class="mt-3 pt-2 border-t border-slate-800 text-[11px] text-purple-400 font-mono">Mandato: Hito 3 (Operación Segura)</div>
           </div>
         </div>
       </div>
@@ -326,16 +485,16 @@
       <div class="bg-slate-900/80 border border-slate-800 rounded-3xl p-5 sm:p-6 shadow-xl">
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-5 pb-4 border-b border-slate-800">
           <div>
-            <h3 class="text-base font-bold text-white flex items-center gap-2">
+            <h3 id="whatif-title" class="text-base font-bold text-white flex items-center gap-2">
               <span>⏱️</span> Simulador Dinámico de Plazos y Dependencias Críticas (What-If)
             </h3>
-            <p class="text-xs text-slate-400 mt-0.5">
+            <p id="whatif-subtitle" class="text-xs text-slate-400 mt-0.5">
               Simula qué ocurre si se retrasa la aprobación de la Ley Nuclear en el Congreso
             </p>
           </div>
 
           <div class="flex items-center gap-3 bg-slate-950 p-2.5 rounded-2xl border border-slate-800">
-            <span class="text-xs text-slate-400 font-medium">Demora en Ley Nuclear:</span>
+            <span id="whatif-delay-label" class="text-xs text-slate-400 font-medium">Demora en Ley Nuclear:</span>
             <input type="range" id="delay-slider" min="0" max="48" step="6" value="0" class="w-24 accent-cyan-400 cursor-pointer" oninput="updateDelay(this.value)">
             <span id="delay-value-txt" class="text-sm font-black text-amber-400 font-mono">+0 m</span>
           </div>
@@ -355,15 +514,15 @@
             <span class="text-xs font-mono font-bold px-3 py-1 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
               IAEA-TECDOC-1993 & NG-T-3.14
             </span>
-            <h2 class="text-lg sm:text-2xl font-black text-white mt-2">
+            <h2 id="cr-title" class="text-lg sm:text-2xl font-black text-white mt-2">
               Asistente de Redacción del Informe Integral (Comprehensive Report)
             </h2>
-            <p class="text-xs text-slate-400 mt-1">
+            <p id="cr-subtitle" class="text-xs text-slate-400 mt-1">
               Estructura oficial para la formulación del documento que fundamenta la decisión soberana de Hito 1
             </p>
           </div>
           <div class="text-left md:text-right">
-            <span class="text-xs text-slate-400 block">Capítulo Activo:</span>
+            <span id="cr-chapter-label" class="text-xs text-slate-400 block">Capítulo Activo:</span>
             <span id="cr-chapter-name" class="text-sm font-bold text-amber-400 font-mono">Capítulo 1: Fundamento Estratégico</span>
           </div>
         </div>
@@ -371,22 +530,22 @@
         <!-- 3 Preguntas de Alto Nivel para Ministros -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 my-5">
           <div class="bg-slate-950/80 p-4 rounded-2xl border border-slate-800">
-            <div class="text-amber-400 font-black text-xs uppercase mb-1">1. ¿Por qué Energía Nuclear?</div>
-            <p class="text-xs text-slate-300 leading-relaxed">
+            <div id="cr-q1-title" class="text-amber-400 font-black text-xs uppercase mb-1">1. ¿Por qué Energía Nuclear?</div>
+            <p id="cr-q1-text" class="text-xs text-slate-300 leading-relaxed">
               Confiabilidad de base 24/7, descarbonización profunda de la matriz eléctrica e industrial, y resiliencia ante sequías climáticas severas (ej. Fenómeno de El Niño).
             </p>
           </div>
 
           <div class="bg-slate-950/80 p-4 rounded-2xl border border-slate-800">
-            <div class="text-cyan-400 font-black text-xs uppercase mb-1">2. ¿Cuál es el compromiso?</div>
-            <p class="text-xs text-slate-300 leading-relaxed">
+            <div id="cr-q2-title" class="text-cyan-400 font-black text-xs uppercase mb-1">2. ¿Cuál es el compromiso?</div>
+            <p id="cr-q2-text" class="text-xs text-slate-300 leading-relaxed">
               Pacto de Estado superior a 100 años (10 años de preparación + 60 años de operación comercial + 30+ años de custodia y desmantelamiento).
             </p>
           </div>
 
           <div class="bg-slate-950/80 p-4 rounded-2xl border border-slate-800">
-            <div class="text-emerald-400 font-black text-xs uppercase mb-1">3. ¿Qué se decide en el Hito 1?</div>
-            <p class="text-xs text-slate-300 leading-relaxed">
+            <div id="cr-q3-title" class="text-emerald-400 font-black text-xs uppercase mb-1">3. ¿Qué se decide en el Hito 1?</div>
+            <p id="cr-q3-text" class="text-xs text-slate-300 leading-relaxed">
               No es comprar un reactor. Es la decisión soberana e informada de crear la infraestructura legal, regulatoria e institucional en la Fase 2.
             </p>
           </div>
@@ -403,19 +562,19 @@
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
             <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800">
-              <strong class="text-cyan-300 block mb-1">1. Diagnóstico de la Situación Nacional:</strong>
+              <strong id="cr-sec1-header" class="text-cyan-300 block mb-1">1. Diagnóstico de la Situación Nacional:</strong>
               <p id="cr-sec-1" class="text-slate-300 leading-relaxed"></p>
             </div>
             <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800">
-              <strong class="text-amber-300 block mb-1">2. Acciones Mandatorias para el Hito 1:</strong>
+              <strong id="cr-sec2-header" class="text-amber-300 block mb-1">2. Acciones Mandatorias para el Hito 1:</strong>
               <p id="cr-sec-2" class="text-slate-300 leading-relaxed"></p>
             </div>
             <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800">
-              <strong class="text-rose-300 block mb-1">3. Principales Riesgos y Cuellos de Botella:</strong>
+              <strong id="cr-sec3-header" class="text-rose-300 block mb-1">3. Principales Riesgos y Cuellos de Botella:</strong>
               <p id="cr-sec-3" class="text-slate-300 leading-relaxed"></p>
             </div>
             <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800">
-              <strong class="text-purple-300 block mb-1">4. Recomendación para la NEPIO en Fase 2:</strong>
+              <strong id="cr-sec4-header" class="text-purple-300 block mb-1">4. Recomendación para la NEPIO en Fase 2:</strong>
               <p id="cr-sec-4" class="text-slate-300 leading-relaxed"></p>
             </div>
           </div>
@@ -430,10 +589,10 @@
       <div class="bg-slate-900/80 border border-slate-800 rounded-3xl p-5 sm:p-6 shadow-xl">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
           <div>
-            <h2 class="text-lg font-bold text-white flex items-center gap-2">
+            <h2 id="bm-title" class="text-lg font-bold text-white flex items-center gap-2">
               <span>🔬</span> Matriz de Impacto en Infraestructura: Reactores Modulares (SMR) vs. Gran Escala
             </h2>
-            <p class="text-xs text-slate-400 mt-0.5">
+            <p id="bm-subtitle" class="text-xs text-slate-400 mt-0.5">
               Análisis comparativo de cómo los reactores modulares transforman las exigencias de los 19 aspectos del OIEA
             </p>
           </div>
@@ -447,7 +606,7 @@
           <div class="bg-indigo-950/25 border-2 border-indigo-500/50 rounded-3xl p-5 sm:p-6 flex flex-col justify-between shadow-lg">
             <div>
               <div class="flex items-center justify-between mb-4">
-                <h3 class="text-base sm:text-lg font-bold text-indigo-300 flex items-center gap-2">
+                <h3 id="bm-smr-title" class="text-base sm:text-lg font-bold text-indigo-300 flex items-center gap-2">
                   ⚛️ Reactores Modulares Pequeños (SMR)
                 </h3>
                 <span class="text-xs px-2.5 py-1 rounded-lg bg-indigo-500/30 text-indigo-200 font-mono font-bold">10 - 300 MWe</span>
@@ -455,23 +614,23 @@
               <ul class="space-y-3.5 text-xs text-slate-300">
                 <li class="flex items-start gap-2.5">
                   <span class="text-emerald-400 font-bold text-sm">✓</span>
-                  <div><strong class="text-slate-100">Red Eléctrica:</strong> No requiere grandes expansiones en líneas de 500 kV; adaptable a nodos minero-energéticos.</div>
+                  <div><strong class="text-slate-100">Red Eléctrica:</strong> <span id="bm-smr-grid">No requiere grandes expansiones en líneas de 500 kV; adaptable a nodos minero-energéticos.</span></div>
                 </li>
                 <li class="flex items-start gap-2.5">
                   <span class="text-emerald-400 font-bold text-sm">✓</span>
-                  <div><strong class="text-slate-100">Inversión (CAPEX):</strong> Menor desembolso inicial ($1B - $2.5B USD); adición modular escalable.</div>
+                  <div><strong class="text-slate-100">Inversión (CAPEX):</strong> <span id="bm-smr-capex">Menor desembolso inicial ($1B - $2.5B USD); adición modular escalable.</span></div>
                 </li>
                 <li class="flex items-start gap-2.5">
                   <span class="text-emerald-400 font-bold text-sm">✓</span>
-                  <div><strong class="text-slate-100">Zona de Emergencia (EPZ):</strong> Confinada al perímetro de la central, facilitando la convivencia comunitaria.</div>
+                  <div><strong class="text-slate-100">Zona de Emergencia (EPZ):</strong> <span id="bm-smr-epz">Confinada al perímetro de la central, facilitando la convivencia comunitaria.</span></div>
                 </li>
                 <li class="flex items-start gap-2.5">
                   <span class="text-emerald-400 font-bold text-sm">✓</span>
-                  <div><strong class="text-slate-100">Construcción:</strong> 24 a 36 meses gracias al ensamblaje modular estandarizado en fábrica.</div>
+                  <div><strong class="text-slate-100">Construcción:</strong> <span id="bm-smr-const">24 a 36 meses gracias al ensamblaje modular estandarizado en fábrica.</span></div>
                 </li>
               </ul>
             </div>
-            <div class="mt-5 pt-3 border-t border-indigo-900/60 text-[11px] text-indigo-300 font-medium">
+            <div id="bm-smr-footer" class="mt-5 pt-3 border-t border-indigo-900/60 text-[11px] text-indigo-300 font-medium">
               Recomendado para: Sustitución de termoeléctricas de carbón (repowering), distritos térmicos y redes medianas.
             </div>
           </div>
@@ -480,7 +639,7 @@
           <div class="bg-slate-950/80 border border-slate-800 rounded-3xl p-5 sm:p-6 flex flex-col justify-between shadow-lg">
             <div>
               <div class="flex items-center justify-between mb-4">
-                <h3 class="text-base sm:text-lg font-bold text-slate-200 flex items-center gap-2">
+                <h3 id="bm-gw-title" class="text-base sm:text-lg font-bold text-slate-200 flex items-center gap-2">
                   🏭 Centrales Convencionales (Gigavatio)
                 </h3>
                 <span class="text-xs px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 font-mono font-bold">1000 - 1600 MWe</span>
@@ -488,23 +647,23 @@
               <ul class="space-y-3.5 text-xs text-slate-400">
                 <li class="flex items-start gap-2.5">
                   <span class="text-amber-400 font-bold text-sm">!</span>
-                  <div><strong class="text-slate-200">Red Eléctrica:</strong> Requiere una red masiva con reserva rodante robusta para soportar contingencias N-1.</div>
+                  <div><strong class="text-slate-200">Red Eléctrica:</strong> <span id="bm-gw-grid">Requiere una red masiva con reserva rodante robusta para soportar contingencias N-1.</span></div>
                 </li>
                 <li class="flex items-start gap-2.5">
                   <span class="text-amber-400 font-bold text-sm">!</span>
-                  <div><strong class="text-slate-200">Inversión (CAPEX):</strong> Elevado desembolso inicial ($8B - $15B+ USD) con alto riesgo financiero durante obras.</div>
+                  <div><strong class="text-slate-200">Inversión (CAPEX):</strong> <span id="bm-gw-capex">Elevado desembolso inicial ($8B - $15B+ USD) con alto riesgo financiero durante obras.</span></div>
                 </li>
                 <li class="flex items-start gap-2.5">
                   <span class="text-amber-400 font-bold text-sm">!</span>
-                  <div><strong class="text-slate-200">Zona de Emergencia (EPZ):</strong> Radio de 15 a 30 km que exige planes masivos de evacuación territorial.</div>
+                  <div><strong class="text-slate-200">Zona de Emergencia (EPZ):</strong> <span id="bm-gw-epz">Radio de 15 a 30 km que exige planes masivos de evacuación territorial.</span></div>
                 </li>
                 <li class="flex items-start gap-2.5">
                   <span class="text-amber-400 font-bold text-sm">!</span>
-                  <div><strong class="text-slate-200">Construcción:</strong> 7 a 10+ años de ejecución de obra civil intensiva en sitio.</div>
+                  <div><strong class="text-slate-200">Construcción:</strong> <span id="bm-gw-const">7 a 10+ años de ejecución de obra civil intensiva en sitio.</span></div>
                 </li>
               </ul>
             </div>
-            <div class="mt-5 pt-3 border-t border-slate-800 text-[11px] text-slate-400 font-medium">
+            <div id="bm-gw-footer" class="mt-5 pt-3 border-t border-slate-800 text-[11px] text-slate-400 font-medium">
               Recomendado para: Países con demanda industrial masiva y redes eléctricas hiper-conectadas.
             </div>
           </div>
@@ -518,10 +677,10 @@
     <div id="panel-simulator" class="tab-panel hidden space-y-6">
       <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 sm:p-6 shadow-2xl">
         <div class="max-w-3xl mb-5">
-          <h2 class="text-lg font-bold text-white flex items-center gap-2">
+          <h2 id="sim-title" class="text-lg font-bold text-white flex items-center gap-2">
             <span>⚖️</span> Simulador de Decisión Soberana & Recomendación de Política Pública
           </h2>
-          <p class="text-xs text-slate-400 mt-1">
+          <p id="sim-subtitle" class="text-xs text-slate-400 mt-1">
             Diagnóstico ejecutivo automático calculado sobre el nivel de madurez alcanzado en los 19 aspectos del OIEA
           </p>
         </div>
@@ -529,26 +688,26 @@
         <div class="bg-slate-950/80 p-4 sm:p-5 rounded-2xl border border-slate-800 mb-6">
           <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
             <div>
-              <span class="text-xs text-slate-400 uppercase tracking-wider">Dictamen para:</span>
+              <span id="sim-country-label" class="text-xs text-slate-400 uppercase tracking-wider">Dictamen para:</span>
               <div id="sim-country-name" class="text-base sm:text-lg font-bold text-cyan-300">Colombia (Fase 1 Inicial)</div>
             </div>
             <div class="flex items-center gap-2">
-              <span class="text-xs text-slate-400 font-mono">Fase Evaluada:</span>
+              <span id="sim-phase-label" class="text-xs text-slate-400 font-mono">Fase Evaluada:</span>
               <span id="sim-phase-tag" class="px-3 py-1 rounded-lg bg-cyan-500/20 text-cyan-300 font-mono font-bold text-xs">Fase 1</span>
             </div>
           </div>
 
           <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3.5 text-xs">
             <div class="p-3 rounded-xl bg-slate-900 border border-slate-800">
-              <span class="text-slate-400 block mb-1 font-semibold">Estado del Hito:</span>
+              <span id="sim-status-label" class="text-slate-400 block mb-1 font-semibold">Estado del Hito:</span>
               <span id="sim-milestone-status" class="text-amber-400 font-bold text-sm">En Formulación (Estudios Iniciales)</span>
             </div>
             <div class="p-3 rounded-xl bg-slate-900 border border-slate-800">
-              <span class="text-slate-400 block mb-1 font-semibold">Tecnología Sugerida:</span>
+              <span id="sim-tech-label" class="text-slate-400 block mb-1 font-semibold">Tecnología Sugerida:</span>
               <span id="sim-tech-status" class="text-cyan-400 font-bold text-sm">SMR (Reactores Modulares Pequeños)</span>
             </div>
             <div class="p-3 rounded-xl bg-slate-900 border border-slate-800">
-              <span class="text-slate-400 block mb-1 font-semibold">Tiempo Estimado a Hito:</span>
+              <span id="sim-time-label" class="text-slate-400 block mb-1 font-semibold">Tiempo Estimado a Hito:</span>
               <span id="sim-time-status" class="text-emerald-400 font-bold text-sm">18 a 36 meses</span>
             </div>
           </div>
@@ -556,13 +715,13 @@
 
         <!-- 3 Prioridades Inmediatas -->
         <div class="space-y-3">
-          <h3 class="text-sm font-bold text-slate-200">📌 Las 3 Acciones Prioritarias Inmediatas para el Gobierno:</h3>
+          <h3 id="sim-actions-header" class="text-sm font-bold text-slate-200">📌 Las 3 Acciones Prioritarias Inmediatas para el Gobierno:</h3>
 
           <div class="p-4 rounded-2xl bg-cyan-950/20 border border-cyan-500/40 flex items-start gap-3 text-xs">
             <span class="w-6 h-6 rounded-full bg-cyan-500 text-slate-950 font-black flex items-center justify-center flex-shrink-0 mt-0.5">1</span>
             <div>
-              <strong class="text-cyan-300 block text-sm">Formalizar la NEPIO mediante Decreto Presidencial</strong>
-              <p class="text-slate-300 mt-1 leading-relaxed">
+              <strong id="sim-act1-title" class="text-cyan-300 block text-sm">Formalizar la NEPIO mediante Decreto Presidencial</strong>
+              <p id="sim-act1-desc" class="text-slate-300 mt-1 leading-relaxed">
                 Crear el Comité Directivo Interministerial con mandato explícito, presupuesto propio asignado y secretaría técnica permanente para conducir los estudios de prefactibilidad.
               </p>
             </div>
@@ -571,8 +730,8 @@
           <div class="p-4 rounded-2xl bg-indigo-950/20 border border-indigo-500/40 flex items-start gap-3 text-xs">
             <span class="w-6 h-6 rounded-full bg-indigo-500 text-white font-black flex items-center justify-center flex-shrink-0 mt-0.5">2</span>
             <div>
-              <strong class="text-indigo-300 block text-sm">Redactar el Proyecto de Ley Nuclear Integral</strong>
-              <p class="text-slate-300 mt-1 leading-relaxed">
+              <strong id="sim-act2-title" class="text-indigo-300 block text-sm">Redactar el Proyecto de Ley Nuclear Integral</strong>
+              <p id="sim-act2-desc" class="text-slate-300 mt-1 leading-relaxed">
                 Garantizar la escisión regulatoria obligatoria: crear una Autoridad Nacional de Seguridad Nuclear 100% autónoma del sector promotor de energía, cumpliendo la norma OIEA GSR Part 1.
               </p>
             </div>
@@ -581,8 +740,8 @@
           <div class="p-4 rounded-2xl bg-emerald-950/20 border border-emerald-500/40 flex items-start gap-3 text-xs">
             <span class="w-6 h-6 rounded-full bg-emerald-500 text-slate-950 font-black flex items-center justify-center flex-shrink-0 mt-0.5">3</span>
             <div>
-              <strong class="text-emerald-300 block text-sm">Completar el Comprehensive Report (Informe Integral de Hito 1)</strong>
-              <p class="text-slate-300 mt-1 leading-relaxed">
+              <strong id="sim-act3-title" class="text-emerald-300 block text-sm">Completar el Comprehensive Report (Informe Integral de Hito 1)</strong>
+              <p id="sim-act3-desc" class="text-slate-300 mt-1 leading-relaxed">
                 Consolidar los estudios de viabilidad de los 19 aspectos del OIEA para fundamentar la decisión política ante el Congreso y la opinión pública nacional e internacional.
               </p>
             </div>
@@ -601,15 +760,15 @@
             <span class="text-xs font-mono font-bold px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
               IAEA Services Series No. 34 & NG-T-3.2 Rev. 1
             </span>
-            <h2 class="text-lg sm:text-xl font-bold text-white mt-2 flex items-center gap-2">
+            <h2 id="inir-title" class="text-lg sm:text-xl font-bold text-white mt-2 flex items-center gap-2">
               <span>📝</span> Módulo de Autoevaluación INIR (Integrated Nuclear Infrastructure Review)
             </h2>
-            <p class="text-xs text-slate-400 mt-1">
+            <p id="inir-subtitle" class="text-xs text-slate-400 mt-1">
               Ajusta interactivamente los niveles de cumplimiento para calibrar las brechas de tu país en tiempo real.
             </p>
           </div>
 
-          <button onclick="loadSampleScenario()" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs text-cyan-300 font-bold border border-slate-700 transition">
+          <button id="inir-sample-btn" onclick="loadSampleScenario()" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs text-cyan-300 font-bold border border-slate-700 transition">
             ⚡ Cargar Escenario Simulado
           </button>
         </div>
@@ -620,10 +779,10 @@
 
     <!-- FOOTER METODOLÓGICO -->
     <footer class="p-4 rounded-2xl bg-slate-900/60 border border-slate-800 text-center text-xs text-slate-400 flex flex-col sm:flex-row items-center justify-between gap-3">
-      <div>
+      <div id="footer-text">
         Basado en la metodología oficial del <strong>Organismo Internacional de Energía Atómica (OIEA)</strong> — Documentos NG-G-3.1 Rev. 2, NG-T-3.14, NG-T-3.6 Rev. 1 y TECDOC-1993.
       </div>
-      <div class="font-mono text-cyan-400 font-bold">19 Cuadernos Técnicos de Infraestructura</div>
+      <div id="footer-issues" class="font-mono text-cyan-400 font-bold">19 Cuadernos Técnicos de Infraestructura</div>
     </footer>
   </div>
 
@@ -638,9 +797,9 @@
         flag: '🇨🇴',
         name: { es: 'Colombia (Fase 1 Inicial)', en: 'Colombia (Phase 1 Embarking)' },
         roles: {
-          gov: 'MinMinas (MME) / Presidencia / UPME / DNP',
-          reg: 'Subdirección Asuntos Nucleares (MME) [A escindir]',
-          op: 'Por designar (Empresa Pública o Mixta / Genco)'
+          gov: { es: 'MinMinas (MME) / Presidencia / UPME / DNP', en: 'Ministry of Mines & Energy / Presidency / UPME / DNP' },
+          reg: { es: 'Subdirección Asuntos Nucleares (MME) [A escindir]', en: 'Nuclear Affairs Directorate (MME) [To be spun off]' },
+          op: { es: 'Por designar (Empresa Pública o Mixta / Genco)', en: 'To be designated (Public or Mixed Utility / Genco)' }
         }
       },
       embarking_p1: {
@@ -648,9 +807,9 @@
         flag: '🌐',
         name: { es: 'País Principiante (Fase 1 OIEA)', en: 'Generic Embarking (Phase 1)' },
         roles: {
-          gov: 'Ministerio de Energía / Comisión Presidencial NEPIO',
-          reg: 'Autoridad Radiológica (en transición a Nuclear)',
-          op: 'Empresa Eléctrica Nacional o Entidad Promotora'
+          gov: { es: 'Ministerio de Energía / Comisión Presidencial NEPIO', en: 'Ministry of Energy / Presidential NEPIO Commission' },
+          reg: { es: 'Autoridad Radiológica (en transición a Nuclear)', en: 'Radiation Authority (transitioning to Nuclear)' },
+          op: { es: 'Empresa Eléctrica Nacional o Entidad Promotora', en: 'National Power Utility or Sponsoring Entity' }
         }
       },
       embarking_p2: {
@@ -658,19 +817,19 @@
         flag: '🏗️',
         name: { es: 'País en Preparación (Fase 2)', en: 'Advanced Embarking (Phase 2)' },
         roles: {
-          gov: 'NEPIO Permanente / Ministerio de Planificación',
-          reg: 'Autoridad Regulatoria Nuclear Autónoma en formación',
-          op: 'Organización Propietaria-Operadora (Owner/Operator)'
+          gov: { es: 'NEPIO Permanente / Ministerio de Planificación', en: 'Permanent NEPIO / Ministry of Planning' },
+          reg: { es: 'Autoridad Regulatoria Nuclear Autónoma en formación', en: 'Autonomous Nuclear Regulatory Authority in establishment' },
+          op: { es: 'Organización Propietaria-Operadora (Owner/Operator)', en: 'Owner/Operator Organization' }
         }
       },
       expanding: {
         id: 'expanding',
         flag: '⚛️',
-        name: { es: 'País con Infraestructura / Expansión', en: 'Expanding / Nuclear Experience' },
+        name: { es: 'País con Infraestructura / Expansión', en: 'Country with Nuclear Experience' },
         roles: {
-          gov: 'Ministerio de Energía / Comisión Nacional Atómica',
-          reg: 'Autoridad Regulatoria Nuclear consolidada',
-          op: 'Empresa Nuclear Operadora con licencia activa'
+          gov: { es: 'Ministerio de Energía / Comisión Nacional Atómica', en: 'Ministry of Energy / National Atomic Commission' },
+          reg: { es: 'Autoridad Regulatoria Nuclear consolidada', en: 'Consolidated Nuclear Regulatory Authority' },
+          op: { es: 'Empresa Nuclear Operadora con licencia activa', en: 'Licensed Operating Utility' }
         }
       },
       custom: {
@@ -678,9 +837,9 @@
         flag: '✏️',
         name: { es: 'Mi País (Autodiagnóstico INIR)', en: 'Custom Country (Self-Assessment)' },
         roles: {
-          gov: 'Entidad Gubernamental / NEPIO Nacional',
-          reg: 'Ente Regulador Designado',
-          op: 'Entidad Propietaria / Operador de Red'
+          gov: { es: 'Entidad Gubernamental / NEPIO Nacional', en: 'Government Agency / National NEPIO' },
+          reg: { es: 'Ente Regulador Designado', en: 'Designated Regulatory Body' },
+          op: { es: 'Entidad Propietaria / Operador de Red', en: 'Owner Entity / Grid Operator' }
         }
       }
     };
@@ -989,12 +1148,178 @@
       customScores[i.id] = { p1: 35, p2: 15, p3: 0 };
     });
 
+    // Matriz de evaluación reactiva por país, aspecto y fase (Fase 1, Fase 2, Fase 3)
+    let evaluatedScores = {
+      colombia: {},
+      embarking_p1: {},
+      embarking_p2: {},
+      expanding: {},
+      custom: {}
+    };
+
+    function initEvaluatedScores() {
+      const countries = ['colombia', 'embarking_p1', 'embarking_p2', 'expanding', 'custom'];
+      countries.forEach(c => {
+        evaluatedScores[c] = {};
+        INFRASTRUCTURE_ISSUES.forEach(issue => {
+          if (c === 'custom') {
+            evaluatedScores[c][issue.id] = { p1: 35, p2: 15, p3: 0 };
+          } else {
+            const sc = issue.scores[c] || issue.scores.embarking_p1;
+            evaluatedScores[c][issue.id] = {
+              p1: sc.p1 !== undefined ? sc.p1 : 25,
+              p2: sc.p2 !== undefined ? sc.p2 : 10,
+              p3: sc.p3 !== undefined ? sc.p3 : 0
+            };
+          }
+        });
+      });
+
+      try {
+        const saved = localStorage.getItem('nuclear_cockpit_eval_v2');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (parsed && typeof parsed === 'object') {
+            countries.forEach(c => {
+              if (parsed[c]) {
+                INFRASTRUCTURE_ISSUES.forEach(issue => {
+                  if (parsed[c][issue.id]) {
+                    evaluatedScores[c][issue.id] = Object.assign({}, evaluatedScores[c][issue.id], parsed[c][issue.id]);
+                  }
+                });
+              }
+            });
+          }
+        }
+      } catch(e) {}
+    }
+
+    function saveEvaluatedScores() {
+      try {
+        localStorage.setItem('nuclear_cockpit_eval_v2', JSON.stringify(evaluatedScores));
+      } catch(e) {}
+    }
+
     function getIssueScore(item, phase) {
-      if (currentCountry === 'custom') {
-        return customScores[item.id]['p' + phase] || 30;
+      const pKey = 'p' + (phase || currentPhase);
+      const c = evaluatedScores[currentCountry];
+      if (c && c[item.id] && c[item.id][pKey] !== undefined) {
+        return c[item.id][pKey];
+      }
+      if (currentCountry === 'custom' && customScores[item.id]) {
+        return customScores[item.id][pKey] !== undefined ? customScores[item.id][pKey] : 30;
       }
       const pScores = item.scores[currentCountry] || item.scores.embarking_p1;
-      return pScores['p' + phase] !== undefined ? pScores['p' + phase] : 25;
+      return pScores && pScores[pKey] !== undefined ? pScores[pKey] : 25;
+    }
+
+    function setIssueScore(issueId, phase, value) {
+      let val = parseInt(value, 10);
+      if (isNaN(val)) val = 0;
+      if (val < 0) val = 0;
+      if (val > 100) val = 100;
+
+      if (!evaluatedScores[currentCountry]) evaluatedScores[currentCountry] = {};
+      if (!evaluatedScores[currentCountry][issueId]) {
+        evaluatedScores[currentCountry][issueId] = { p1: 25, p2: 10, p3: 0 };
+      }
+      evaluatedScores[currentCountry][issueId]['p' + phase] = val;
+      if (customScores[issueId]) {
+        customScores[issueId]['p' + phase] = val;
+      }
+      saveEvaluatedScores();
+      updateUI();
+    }
+
+    function onIssueScoreInput(value) {
+      setIssueScore(selectedIssueId, currentPhase, value);
+    }
+
+    function adjustCurrentScore(delta) {
+      const cur = getIssueScore({ id: selectedIssueId }, currentPhase);
+      setIssueScore(selectedIssueId, currentPhase, cur + delta);
+    }
+
+    function onChecklistChange(boxNum, isChecked) {
+      const chk1 = document.getElementById('eval-chk-1')?.checked || false;
+      const chk2 = document.getElementById('eval-chk-2')?.checked || false;
+      const chk3 = document.getElementById('eval-chk-3')?.checked || false;
+      const chk4 = document.getElementById('eval-chk-4')?.checked || false;
+      const count = (chk1 ? 1 : 0) + (chk2 ? 1 : 0) + (chk3 ? 1 : 0) + (chk4 ? 1 : 0);
+      setIssueScore(selectedIssueId, currentPhase, count * 25);
+    }
+
+    function resetCurrentIssueScore() {
+      const issue = INFRASTRUCTURE_ISSUES.find(i => i.id === selectedIssueId);
+      if (!issue) return;
+      const base = (currentCountry === 'custom')
+        ? { p1: 35, p2: 15, p3: 0 }
+        : (issue.scores[currentCountry] || issue.scores.embarking_p1);
+      
+      const pKey = 'p' + currentPhase;
+      const defaultVal = base[pKey] !== undefined ? base[pKey] : 25;
+      setIssueScore(selectedIssueId, currentPhase, defaultVal);
+    }
+
+    function resetAllScoresCurrentCountry() {
+      INFRASTRUCTURE_ISSUES.forEach(issue => {
+        const base = (currentCountry === 'custom')
+          ? { p1: 35, p2: 15, p3: 0 }
+          : (issue.scores[currentCountry] || issue.scores.embarking_p1);
+        evaluatedScores[currentCountry][issue.id] = {
+          p1: base.p1 !== undefined ? base.p1 : 25,
+          p2: base.p2 !== undefined ? base.p2 : 10,
+          p3: base.p3 !== undefined ? base.p3 : 0
+        };
+      });
+      saveEvaluatedScores();
+      updateUI();
+      if (currentTab === 'inir') renderInirSliders();
+    }
+
+    function toggleEvaluationMatrix() {
+      const panel = document.getElementById('panel-quick-matrix');
+      const btnTxt = document.getElementById('eval-matrix-btn-text');
+      if (!panel) return;
+      const isHidden = panel.classList.contains('hidden');
+      if (isHidden) {
+        panel.classList.remove('hidden');
+        if (btnTxt) btnTxt.textContent = currentLang === 'es' ? 'Ocultar Matriz' : 'Hide Matrix';
+        renderEvaluationMatrix();
+      } else {
+        panel.classList.add('hidden');
+        if (btnTxt) btnTxt.textContent = currentLang === 'es' ? 'Matriz Completa (19 Issues)' : 'Complete Matrix (19 Issues)';
+      }
+    }
+
+    function renderEvaluationMatrix() {
+      const container = document.getElementById('matrix-sliders-container');
+      if (!container) return;
+      container.innerHTML = INFRASTRUCTURE_ISSUES.map(issue => {
+        const score = getIssueScore(issue, currentPhase);
+        const isSelected = selectedIssueId === issue.id;
+        let badgeClass = 'text-rose-400 bg-rose-950/60 border-rose-800/40';
+        if (score >= 70) badgeClass = 'text-emerald-400 bg-emerald-950/60 border-emerald-800/40';
+        else if (score >= 35) badgeClass = 'text-amber-400 bg-amber-950/60 border-amber-800/40';
+
+        return `
+          <div class="p-2.5 rounded-xl border transition ${isSelected ? 'bg-cyan-950/30 border-cyan-500/50 ring-1 ring-cyan-500/30' : 'bg-slate-950/70 border-slate-800 hover:border-slate-700'}">
+            <div class="flex items-center justify-between mb-1.5">
+              <button type="button" onclick="selectIssue(${issue.id})" class="text-left font-bold text-[11px] text-slate-200 hover:text-cyan-300 truncate max-w-[170px]">
+                <span class="text-cyan-400 font-mono">#${issue.code}</span> ${t(issue.name)}
+              </button>
+              <span class="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold border ${badgeClass}">
+                ${score}%
+              </span>
+            </div>
+            <div class="flex items-center gap-2">
+              <input type="range" min="0" max="100" step="1" value="${score}"
+                oninput="setIssueScore(${issue.id}, currentPhase, this.value)"
+                class="w-full accent-cyan-400 cursor-pointer h-1.5 bg-slate-800 rounded-lg">
+            </div>
+          </div>
+        `;
+      }).join('');
     }
 
     function calculateOverallReadiness() {
@@ -1147,9 +1472,64 @@
       if (tabKey === 'inir') renderInirSliders();
     }
 
+    function t(val) {
+      if (!val) return '';
+      if (typeof val === 'string') return val;
+      return val[currentLang] || val.es || '';
+    }
+
+    function getIssueText(issueId, field) {
+      const trans = window.ISSUE_TRANSLATIONS && window.ISSUE_TRANSLATIONS[issueId];
+      if (trans && trans[field]) {
+        return t(trans[field]);
+      }
+      return '';
+    }
+
+    function updateCountrySelectOptions() {
+      const sel = document.getElementById('country-select');
+      if (!sel) return;
+      const cur = sel.value || currentCountry;
+      sel.innerHTML = Object.keys(COUNTRY_PROFILES).map(k => {
+        const cp = COUNTRY_PROFILES[k];
+        return `<option value="${k}">${cp.flag} ${t(cp.name)}</option>`;
+      }).join('');
+      sel.value = cur;
+    }
+
+    function renderQuickButtons() {
+      const btnCont = document.getElementById('quick-buttons-container');
+      if (!btnCont) return;
+      btnCont.innerHTML = INFRASTRUCTURE_ISSUES.map(item => {
+        const score = getIssueScore(item, currentPhase);
+        const isSelected = selectedIssueId === item.id;
+        
+        let scoreBadgeClass = 'text-rose-400 bg-rose-950/60 border-rose-800/50';
+        if (score >= 70) scoreBadgeClass = 'text-emerald-400 bg-emerald-950/60 border-emerald-800/50';
+        else if (score >= 35) scoreBadgeClass = 'text-amber-400 bg-amber-950/60 border-amber-800/50';
+
+        const activeClass = isSelected
+          ? 'bg-cyan-500 text-slate-950 font-black ring-2 ring-cyan-300 shadow-md shadow-cyan-500/30'
+          : 'bg-slate-800/90 text-slate-300 hover:bg-slate-700/80 border border-slate-700/60';
+
+        const innerBadge = isSelected
+          ? 'bg-slate-950/30 text-slate-950 border-transparent'
+          : scoreBadgeClass;
+
+        return `
+          <button onclick="selectIssue(${item.id})" id="quick-btn-${item.id}"
+            class="px-2.5 py-1 rounded-xl text-xs font-mono transition flex items-center gap-1.5 ${activeClass}">
+            <span>#${item.code}</span>
+            <span class="text-[10px] px-1.5 py-0.5 rounded-md font-bold border ${innerBadge}">${score}%</span>
+          </button>
+        `;
+      }).join('');
+    }
+
     function updateDelay(val) {
       whatIfDelay = parseInt(val) || 0;
-      document.getElementById('delay-value-txt').textContent = `+${whatIfDelay} m`;
+      const unit = currentLang === 'es' ? 'm' : 'mo';
+      document.getElementById('delay-value-txt').textContent = `+${whatIfDelay} ${unit}`;
       renderRoadmapTimeline();
     }
 
@@ -1157,16 +1537,23 @@
       const cont = document.getElementById('roadmap-timeline-container');
       if (!cont) return;
 
-      const steps = [
+      const stepsList = (window.ROADMAP_STEPS && window.ROADMAP_STEPS[currentLang]) ? window.ROADMAP_STEPS[currentLang] : [
         { phase: 'Fase 1', code: 'P1', title: 'Estudios de Viabilidad & Comprehensive Report (NEPIO)', baseDuration: 36, delay: 0 },
-        { phase: 'Hito 1', code: 'M1', title: 'Decisión Soberana & Promulgación de Ley Nuclear', baseDuration: 18, delay: whatIfDelay },
-        { phase: 'Fase 2', code: 'P2', title: 'Creación del Regulador, Caracterización de Sitio & Licitación', baseDuration: 48, delay: Math.round(whatIfDelay * 0.7) },
+        { phase: 'Hito 1', code: 'M1', title: 'Decisión Soberana & Promulgación de Ley Nuclear', baseDuration: 18, delay: 0 },
+        { phase: 'Fase 2', code: 'P2', title: 'Creación del Regulador, Caracterización de Sitio & Licitación', baseDuration: 48, delay: 0 },
         { phase: 'Hito 2', code: 'M2', title: 'Firma de Contrato EPC / PPA con Proveedor', baseDuration: 12, delay: 0 },
-        { phase: 'Fase 3', code: 'P3', title: 'Construcción, Ensayos Preoperacionales & Carga de Combustible', baseDuration: currentTech === 'smr' ? 42 : 84, delay: 0 }
+        { phase: 'Fase 3', code: 'P3', title: 'Construcción, Ensayos Preoperacionales & Carga de Combustible', baseDuration: 42, delay: 0 }
       ];
 
-      cont.innerHTML = steps.map(s => {
-        const total = s.baseDuration + s.delay;
+      const durationLabel = currentLang === 'es' ? 'Plazo estimado:' : 'Estimated duration:';
+      const monthUnit = currentLang === 'es' ? 'meses' : 'months';
+
+      cont.innerHTML = stepsList.map(s => {
+        const delay = s.code === 'M1' ? whatIfDelay : (s.code === 'P2' ? Math.round(whatIfDelay * 0.7) : 0);
+        const duration = s.code === 'P3' ? (currentTech === 'smr' ? 42 : 84) : s.baseDuration;
+        const total = duration + delay;
+        const delayText = currentLang === 'es' ? `+${delay}m Retraso` : `+${delay}mo Delay`;
+
         return `
           <div class="bg-slate-950/70 p-3.5 rounded-2xl border border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-3">
             <div class="flex items-center gap-3">
@@ -1177,8 +1564,8 @@
               </div>
             </div>
             <div class="flex items-center gap-4 text-xs">
-              <div class="text-slate-400">Plazo estimado: <strong class="text-white font-mono text-sm">${total} meses</strong></div>
-              ${s.delay > 0 ? `<span class="px-2.5 py-0.5 rounded-full bg-rose-500/20 text-rose-300 font-bold border border-rose-500/30 animate-pulse">+${s.delay}m Retraso</span>` : ''}
+              <div class="text-slate-400">${durationLabel} <strong class="text-white font-mono text-sm">${total} ${monthUnit}</strong></div>
+              ${delay > 0 ? `<span class="px-2.5 py-0.5 rounded-full bg-rose-500/20 text-rose-300 font-bold border border-rose-500/30 animate-pulse">${delayText}</span>` : ''}
             </div>
           </div>
         `;
@@ -1188,11 +1575,15 @@
     function renderInirSliders() {
       const grid = document.getElementById('inir-sliders-grid');
       if (!grid) return;
+      const T = window.UI_TEXTS ? window.UI_TEXTS[currentLang] : null;
 
       grid.innerHTML = INFRASTRUCTURE_ISSUES.map(issue => {
         const score = getIssueScore(issue, currentPhase);
         const statusClass = score < 35 ? 'bg-rose-500/20 text-rose-300 border-rose-500/40' : (score < 70 ? 'bg-amber-500/20 text-amber-300 border-amber-500/40' : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40');
-        const statusLabel = score < 35 ? 'Requiere Acción' : (score < 70 ? 'En Progreso' : 'Adecuado Hito');
+        const statusLabel = score < 35 
+          ? (T ? T.inirActionReq : 'Requiere Acción') 
+          : (score < 70 ? (T ? T.inirInProgress : 'En Progreso') : (T ? T.inirAdequate : 'Adecuado Hito'));
+        const sliderLabel = T ? T.inirReadinessLabel : 'Madurez Fase ';
 
         return `
           <div class="bg-slate-950/70 border border-slate-800 rounded-2xl p-4 flex flex-col justify-between hover:border-slate-700 transition">
@@ -1201,13 +1592,13 @@
                 <span class="text-xs font-mono font-bold px-2 py-0.5 rounded bg-slate-800 text-cyan-400">#${issue.code}</span>
                 <span class="text-[10px] font-bold px-2 py-0.5 rounded-full border ${statusClass}">${statusLabel}</span>
               </div>
-              <h4 class="text-xs font-bold text-slate-100 truncate">${issue.name[currentLang]}</h4>
+              <h4 class="text-xs font-bold text-slate-100 truncate">${t(issue.name)}</h4>
               <span class="text-[10px] text-slate-400 font-mono block mt-0.5">${issue.refOIEA}</span>
             </div>
 
             <div class="mt-3 pt-2 border-t border-slate-800">
               <div class="flex items-center justify-between text-xs mb-1">
-                <span class="text-slate-400">Madurez Fase ${currentPhase}:</span>
+                <span class="text-slate-400">${sliderLabel}${currentPhase}:</span>
                 <span class="font-mono font-bold text-white" id="slider-txt-${issue.id}">${score}%</span>
               </div>
               <input type="range" min="0" max="100" step="5" value="${score}"
@@ -1220,93 +1611,512 @@
     }
 
     function onInirChange(issueId, value) {
-      const val = parseInt(value) || 0;
-      customScores[issueId]['p' + currentPhase] = val;
-      document.getElementById('slider-txt-' + issueId).textContent = val + '%';
-      currentCountry = 'custom';
-      document.getElementById('country-select').value = 'custom';
-      updateUI();
+      setIssueScore(issueId, currentPhase, value);
+      const txt = document.getElementById('slider-txt-' + issueId);
+      if (txt) txt.textContent = value + '%';
     }
 
     function loadSampleScenario() {
       INFRASTRUCTURE_ISSUES.forEach(i => {
-        customScores[i.id] = { p1: 65, p2: 30, p3: 10 };
+        setIssueScore(i.id, 1, 65);
+        setIssueScore(i.id, 2, 30);
+        setIssueScore(i.id, 3, 10);
       });
-      currentCountry = 'custom';
-      document.getElementById('country-select').value = 'custom';
       updateUI();
       renderInirSliders();
+    }
+
+    function applyLanguage() {
+      const T = window.UI_TEXTS ? window.UI_TEXTS[currentLang] : null;
+      if (!T) return;
+
+      const subhead = document.getElementById('subheading-text');
+      if (subhead) subhead.textContent = T.subheading;
+
+      const btnLang = document.getElementById('btn-lang');
+      if (btnLang) btnLang.textContent = T.langBtn;
+
+      const btnGw = document.getElementById('btn-tech-gw');
+      if (btnGw) btnGw.textContent = T.techGW;
+
+      const btnSmr = document.getElementById('btn-tech-smr');
+      if (btnSmr) btnSmr.textContent = T.techSMR;
+
+      updateCountrySelectOptions();
+
+      // Phase cards
+      const p1 = document.getElementById('phase-card-1');
+      if (p1) {
+        const spans = p1.querySelectorAll('span');
+        if (spans[0]) spans[0].textContent = T.phase1Header;
+        if (spans[1]) spans[1].textContent = T.phasePrefix + '1';
+        const titleEl = p1.querySelector('.text-sm');
+        if (titleEl) titleEl.textContent = T.phase1Milestone;
+        const subEl = p1.querySelector('.text-\\[11px\\]');
+        if (subEl) subEl.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span> ${T.phase1Doc}`;
+      }
+      const p2 = document.getElementById('phase-card-2');
+      if (p2) {
+        const spans = p2.querySelectorAll('span');
+        if (spans[0]) spans[0].textContent = T.phase2Header;
+        if (spans[1]) spans[1].textContent = T.phasePrefix + '2';
+        const titleEl = p2.querySelector('.text-sm');
+        if (titleEl) titleEl.textContent = T.phase2Milestone;
+        const subEl = p2.querySelector('.text-\\[11px\\]');
+        if (subEl) subEl.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-slate-600"></span> ${T.phase2Doc}`;
+      }
+      const p3 = document.getElementById('phase-card-3');
+      if (p3) {
+        const spans = p3.querySelectorAll('span');
+        if (spans[0]) spans[0].textContent = T.phase3Header;
+        if (spans[1]) spans[1].textContent = T.phasePrefix + '3';
+        const titleEl = p3.querySelector('.text-sm');
+        if (titleEl) titleEl.textContent = T.phase3Milestone;
+        const subEl = p3.querySelector('.text-\\[11px\\]');
+        if (subEl) subEl.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-slate-600"></span> ${T.phase3Doc}`;
+      }
+
+      // Tabs
+      const setBtn = (id, icon, text) => {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = `<span>${icon}</span> <span>${text}</span>`;
+      };
+      setBtn('tab-btn-radar', '🕸️', T.tabRadar);
+      setBtn('tab-btn-roadmap', '⚡', T.tabRoadmap);
+      setBtn('tab-btn-studio', '📑', T.tabStudio);
+      setBtn('tab-btn-benchmark', '🔬', T.tabBenchmark);
+      setBtn('tab-btn-simulator', '⚖️', T.tabSimulator);
+      setBtn('tab-btn-inir', '📝', T.tabInir);
+
+      const ovLbl = document.getElementById('overall-label');
+      if (ovLbl) ovLbl.textContent = T.overallLabel;
+
+      const rTitle = document.getElementById('radar-title');
+      if (rTitle) rTitle.innerHTML = `<span class="text-cyan-400">●</span> ${T.radarTitle}`;
+      const rSubtitle = document.getElementById('radar-subtitle');
+      if (rSubtitle) rSubtitle.textContent = T.radarSubtitle;
+
+      const rLegend = document.getElementById('radar-legend');
+      if (rLegend && rLegend.children.length >= 6) {
+        rLegend.children[0].querySelector('span:last-child').textContent = T.legendGov;
+        rLegend.children[1].querySelector('span:last-child').textContent = T.legendSafety;
+        rLegend.children[2].querySelector('span:last-child').textContent = T.legendLegal;
+        rLegend.children[3].querySelector('span:last-child').textContent = T.legendSec;
+        rLegend.children[4].querySelector('span:last-child').textContent = T.legendGrid;
+        rLegend.children[5].querySelector('span:last-child').textContent = T.legendTalent;
+      }
+
+      const cardScoreLbl = document.getElementById('card-score-label');
+      if (cardScoreLbl) cardScoreLbl.textContent = T.cardReadiness;
+      const cardRolesH = document.getElementById('card-roles-header');
+      if (cardRolesH) cardRolesH.textContent = T.cardRolesHeader;
+      const cardDelivH = document.getElementById('card-deliv-header');
+      if (cardDelivH) cardDelivH.textContent = T.cardDelivHeader;
+      const cardGapH = document.getElementById('card-gap-header');
+      if (cardGapH) cardGapH.textContent = T.cardGapHeader;
+      const cardSmrH = document.getElementById('card-smr-header');
+      if (cardSmrH) cardSmrH.textContent = T.cardSmrHeader;
+      const quickH = document.getElementById('quick-select-header');
+      if (quickH) quickH.textContent = T.quickSelectHeader;
+
+      const govT = document.getElementById('gov-title');
+      if (govT) govT.innerHTML = `<span>🏛️</span> ${T.govTitle}`;
+      const govSub = document.getElementById('gov-subtitle');
+      if (govSub) govSub.textContent = T.govSubtitle;
+      const nepioT = document.getElementById('nepio-title');
+      if (nepioT) nepioT.textContent = T.nepioTitle;
+      const nepioDesc = document.getElementById('nepio-desc');
+      if (nepioDesc) nepioDesc.textContent = T.nepioDesc;
+      const nepioMand = document.getElementById('nepio-mandate');
+      if (nepioMand) nepioMand.textContent = T.nepioMandate;
+      const regT = document.getElementById('reg-title');
+      if (regT) regT.textContent = T.regTitle;
+      const regDesc = document.getElementById('reg-desc');
+      if (regDesc) regDesc.textContent = T.regDesc;
+      const regMand = document.getElementById('reg-mandate');
+      if (regMand) regMand.textContent = T.regMandate;
+      const opT = document.getElementById('op-title');
+      if (opT) opT.textContent = T.opTitle;
+      const opDesc = document.getElementById('op-desc');
+      if (opDesc) opDesc.textContent = T.opDesc;
+      const opMand = document.getElementById('op-mandate');
+      if (opMand) opMand.textContent = T.opMandate;
+      const whatifT = document.getElementById('whatif-title');
+      if (whatifT) whatifT.innerHTML = `<span>⏱️</span> ${T.whatifTitle}`;
+      const whatifSub = document.getElementById('whatif-subtitle');
+      if (whatifSub) whatifSub.textContent = T.whatifSubtitle;
+      const whatifLbl = document.getElementById('whatif-delay-label');
+      if (whatifLbl) whatifLbl.textContent = T.whatifDelayLabel;
+
+      const crT = document.getElementById('cr-title');
+      if (crT) crT.textContent = T.crTitle;
+      const crSub = document.getElementById('cr-subtitle');
+      if (crSub) crSub.textContent = T.crSubtitle;
+      const crChLbl = document.getElementById('cr-chapter-label');
+      if (crChLbl) crChLbl.textContent = T.crChapterLabel;
+      const crQ1T = document.getElementById('cr-q1-title');
+      if (crQ1T) crQ1T.textContent = T.crQ1Title;
+      const crQ1Txt = document.getElementById('cr-q1-text');
+      if (crQ1Txt) crQ1Txt.textContent = T.crQ1Text;
+      const crQ2T = document.getElementById('cr-q2-title');
+      if (crQ2T) crQ2T.textContent = T.crQ2Title;
+      const crQ2Txt = document.getElementById('cr-q2-text');
+      if (crQ2Txt) crQ2Txt.textContent = T.crQ2Text;
+      const crQ3T = document.getElementById('cr-q3-title');
+      if (crQ3T) crQ3T.textContent = T.crQ3Title;
+      const crQ3Txt = document.getElementById('cr-q3-text');
+      if (crQ3Txt) crQ3Txt.textContent = T.crQ3Text;
+      const crSec1H = document.getElementById('cr-sec1-header');
+      if (crSec1H) crSec1H.textContent = T.crSec1Title;
+      const crSec2H = document.getElementById('cr-sec2-header');
+      if (crSec2H) crSec2H.textContent = T.crSec2Title;
+      const crSec3H = document.getElementById('cr-sec3-header');
+      if (crSec3H) crSec3H.textContent = T.crSec3Title;
+      const crSec4H = document.getElementById('cr-sec4-header');
+      if (crSec4H) crSec4H.textContent = T.crSec4Title;
+
+      const bmT = document.getElementById('bm-title');
+      if (bmT) bmT.innerHTML = `<span>🔬</span> ${T.bmTitle}`;
+      const bmSub = document.getElementById('bm-subtitle');
+      if (bmSub) bmSub.textContent = T.bmSubtitle;
+      const bmSmrT = document.getElementById('bm-smr-title');
+      if (bmSmrT) bmSmrT.textContent = T.bmSmrTitle;
+      const bmSmrGrid = document.getElementById('bm-smr-grid');
+      if (bmSmrGrid) bmSmrGrid.textContent = T.bmSmrGrid;
+      const bmSmrCapex = document.getElementById('bm-smr-capex');
+      if (bmSmrCapex) bmSmrCapex.textContent = T.bmSmrCapex;
+      const bmSmrEpz = document.getElementById('bm-smr-epz');
+      if (bmSmrEpz) bmSmrEpz.textContent = T.bmSmrEpz;
+      const bmSmrConst = document.getElementById('bm-smr-const');
+      if (bmSmrConst) bmSmrConst.textContent = T.bmSmrConst;
+      const bmSmrFoot = document.getElementById('bm-smr-footer');
+      if (bmSmrFoot) bmSmrFoot.textContent = T.bmSmrFooter;
+
+      const bmGwT = document.getElementById('bm-gw-title');
+      if (bmGwT) bmGwT.textContent = T.bmGwTitle;
+      const bmGwGrid = document.getElementById('bm-gw-grid');
+      if (bmGwGrid) bmGwGrid.textContent = T.bmGwGrid;
+      const bmGwCapex = document.getElementById('bm-gw-capex');
+      if (bmGwCapex) bmGwCapex.textContent = T.bmGwCapex;
+      const bmGwEpz = document.getElementById('bm-gw-epz');
+      if (bmGwEpz) bmGwEpz.textContent = T.bmGwEpz;
+      const bmGwConst = document.getElementById('bm-gw-const');
+      if (bmGwConst) bmGwConst.textContent = T.bmGwConst;
+      const bmGwFoot = document.getElementById('bm-gw-footer');
+      if (bmGwFoot) bmGwFoot.textContent = T.bmGwFooter;
+
+      const simT = document.getElementById('sim-title');
+      if (simT) simT.innerHTML = `<span>⚖️</span> ${T.simTitle}`;
+      const simSub = document.getElementById('sim-subtitle');
+      if (simSub) simSub.textContent = T.simSubtitle;
+      const simCLbl = document.getElementById('sim-country-label');
+      if (simCLbl) simCLbl.textContent = T.simCountryLabel;
+      const simPLbl = document.getElementById('sim-phase-label');
+      if (simPLbl) simPLbl.textContent = T.simPhaseLabel;
+      const simStatLbl = document.getElementById('sim-status-label');
+      if (simStatLbl) simStatLbl.textContent = T.simStatusLabel;
+      const simTechLbl = document.getElementById('sim-tech-label');
+      if (simTechLbl) simTechLbl.textContent = T.simTechLabel;
+      const simTimeLbl = document.getElementById('sim-time-label');
+      if (simTimeLbl) simTimeLbl.textContent = T.simTimeLabel;
+      const simActH = document.getElementById('sim-actions-header');
+      if (simActH) simActH.textContent = T.simActionsHeader;
+      const simAct1T = document.getElementById('sim-act1-title');
+      if (simAct1T) simAct1T.textContent = T.simAct1Title;
+      const simAct1D = document.getElementById('sim-act1-desc');
+      if (simAct1D) simAct1D.textContent = T.simAct1Desc;
+      const simAct2T = document.getElementById('sim-act2-title');
+      if (simAct2T) simAct2T.textContent = T.simAct2Title;
+      const simAct2D = document.getElementById('sim-act2-desc');
+      if (simAct2D) simAct2D.textContent = T.simAct2Desc;
+      const simAct3T = document.getElementById('sim-act3-title');
+      if (simAct3T) simAct3T.textContent = T.simAct3Title;
+      const simAct3D = document.getElementById('sim-act3-desc');
+      if (simAct3D) simAct3D.textContent = T.simAct3Desc;
+
+      const inirT = document.getElementById('inir-title');
+      if (inirT) inirT.innerHTML = `<span>📝</span> ${T.inirTitle}`;
+      const inirSub = document.getElementById('inir-subtitle');
+      if (inirSub) inirSub.textContent = T.inirSubtitle;
+      const inirBtn = document.getElementById('inir-sample-btn');
+      if (inirBtn) inirBtn.textContent = T.inirSampleBtn;
+
+      // Traducciones Consola de Evaluación
+      const evalCardT = document.getElementById('eval-card-title');
+      if (evalCardT) evalCardT.textContent = T.evalCardTitle || 'Consola de Evaluación & Ejecución';
+      const evalPhaseLbl = document.getElementById('eval-phase-label');
+      if (evalPhaseLbl) evalPhaseLbl.textContent = T.evalPhaseSelectorLabel || 'Evaluar:';
+      const evalSlideLbl = document.getElementById('eval-slider-label');
+      if (evalSlideLbl) evalSlideLbl.textContent = T.evalSliderLabel || 'Nivel de Ejecución / Madurez:';
+      const evalChkTitle = document.getElementById('eval-checklist-title');
+      if (evalChkTitle) evalChkTitle.innerHTML = `<span>📋</span> ${T.evalChecklistHeader || 'Criterios Clave OIEA para el Hito:'}`;
+      const evalPresLbl = document.getElementById('eval-presets-label');
+      if (evalPresLbl) evalPresLbl.textContent = T.evalQuickPresetsHeader || 'Ajuste rápido:';
+      const evalResBtn = document.getElementById('eval-reset-btn');
+      if (evalResBtn) evalResBtn.textContent = T.evalResetBaseline || '↺ Base';
+      const evalMultiLbl = document.getElementById('eval-multiphase-label');
+      if (evalMultiLbl) evalMultiLbl.textContent = T.evalMultiPhaseHeader || 'Madurez por Fases:';
+      const evalMatBtnTxt = document.getElementById('eval-matrix-btn-text');
+      if (evalMatBtnTxt) {
+        const isHidden = document.getElementById('panel-quick-matrix')?.classList.contains('hidden') !== false;
+        evalMatBtnTxt.textContent = isHidden ? (T.evalMatrixBtn || 'Matriz Completa (19 Issues)') : (T.evalMatrixCloseBtn || 'Cerrar Matriz');
+      }
+      const evalMatT = document.getElementById('eval-matrix-title');
+      if (evalMatT) evalMatT.innerHTML = `<span>📊</span> ${T.evalMatrixTitle || 'Matriz de Calibración Rápida de los 19 Aspectos'}`;
+      const evalMatSub = document.getElementById('eval-matrix-subtitle');
+      if (evalMatSub) evalMatSub.textContent = T.evalMatrixSubtitle || 'Ajusta el porcentaje de cada aspecto para la fase activa sin cambiar de pantalla';
+
+      const footTxt = document.getElementById('footer-text');
+      if (footTxt) footTxt.innerHTML = T.footerText;
+      const footIss = document.getElementById('footer-issues');
+      if (footIss) footIss.textContent = T.footerIssues;
+
+      renderQuickButtons();
     }
 
     function updateUI() {
       const profile = COUNTRY_PROFILES[currentCountry] || COUNTRY_PROFILES.colombia;
       const issue = INFRASTRUCTURE_ISSUES.find(i => i.id === selectedIssueId) || INFRASTRUCTURE_ISSUES[0];
       const readiness = calculateOverallReadiness();
+      const T = window.UI_TEXTS ? window.UI_TEXTS[currentLang] : null;
+      const curScore = getIssueScore(issue, currentPhase);
 
       // Madurez General
       document.getElementById('overall-bar').style.width = readiness + '%';
       document.getElementById('overall-score-txt').textContent = readiness + '%';
-      document.getElementById('radar-phase-tag').textContent = 'Fase ' + currentPhase;
+      document.getElementById('radar-phase-tag').textContent = (T ? T.phasePrefix : 'Fase ') + currentPhase;
 
       // Ficha Diagnóstica Activa
       document.getElementById('card-issue-code').textContent = 'Issue #' + issue.code;
-      document.getElementById('card-issue-name').textContent = issue.name[currentLang];
+      document.getElementById('card-issue-name').textContent = t(issue.name);
       document.getElementById('card-issue-ref').textContent = issue.refOIEA;
-      document.getElementById('card-issue-score').textContent = getIssueScore(issue, currentPhase) + '%';
-      document.getElementById('card-issue-roles').innerHTML = `
-        <span>• <strong>Gobierno / NEPIO:</strong> ${profile.roles.gov}</span><br>
-        <span>• <strong>Regulador:</strong> ${profile.roles.reg}</span><br>
-        <span>• <strong>Operador:</strong> ${profile.roles.op}</span>
-      `;
-      document.getElementById('card-issue-deliverable').textContent = issue.phaseDeliverables['p' + currentPhase];
-      document.getElementById('card-issue-gap').textContent = issue.criticalGaps;
-      document.getElementById('card-issue-smr').textContent = issue.smrImpact;
+      
+      const cardScoreEl = document.getElementById('card-issue-score');
+      if (cardScoreEl) {
+        cardScoreEl.textContent = curScore + '%';
+        if (curScore >= 70) cardScoreEl.className = 'text-2xl font-black text-emerald-400';
+        else if (curScore >= 35) cardScoreEl.className = 'text-2xl font-black text-amber-400';
+        else cardScoreEl.className = 'text-2xl font-black text-rose-400';
+      }
 
-      // Botones rápidos de los 19 aspectos
-      const btnCont = document.getElementById('quick-buttons-container');
-      if (btnCont && btnCont.children.length === 0) {
-        btnCont.innerHTML = INFRASTRUCTURE_ISSUES.map(item => `
-          <button onclick="selectIssue(${item.id})" id="quick-btn-${item.id}"
-            class="px-2.5 py-1 rounded-xl text-xs font-mono transition ${selectedIssueId === item.id ? 'bg-cyan-500 text-slate-950 font-black' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'}">
-            #${item.code} ${item.name.es.split(' ')[0]}
-          </button>
-        `).join('');
-      } else if (btnCont) {
-        INFRASTRUCTURE_ISSUES.forEach(item => {
-          const b = document.getElementById('quick-btn-' + item.id);
-          if (b) {
-            b.className = `px-2.5 py-1 rounded-xl text-xs font-mono transition ${selectedIssueId === item.id ? 'bg-cyan-500 text-slate-950 font-black' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'}`;
+      // Consola de Evaluación: Selector de Fase
+      [1, 2, 3].forEach(p => {
+        const pBtn = document.getElementById('eval-phase-btn-' + p);
+        if (pBtn) {
+          if (p === currentPhase) {
+            pBtn.className = 'px-2 py-0.5 rounded-lg transition text-cyan-300 bg-cyan-500/20 border border-cyan-500/40 font-bold';
+          } else {
+            pBtn.className = 'px-2 py-0.5 rounded-lg transition text-slate-400 hover:text-white border border-transparent';
           }
-        });
+        }
+      });
+
+      // Consola de Evaluación: Slider y número
+      const evalSlider = document.getElementById('issue-eval-slider');
+      if (evalSlider && document.activeElement !== evalSlider) {
+        evalSlider.value = curScore;
+      }
+      const evalNumber = document.getElementById('issue-eval-number');
+      if (evalNumber && document.activeElement !== evalNumber) {
+        evalNumber.value = curScore;
+      }
+
+      // Consola de Evaluación: Barra de progreso y meta
+      const evalProgBar = document.getElementById('eval-progress-bar');
+      if (evalProgBar) {
+        evalProgBar.style.width = curScore + '%';
+        if (curScore >= 70) {
+          evalProgBar.className = 'h-full rounded-full transition-all duration-300 bg-gradient-to-r from-emerald-500 to-cyan-400';
+        } else if (curScore >= 35) {
+          evalProgBar.className = 'h-full rounded-full transition-all duration-300 bg-gradient-to-r from-amber-500 to-cyan-400';
+        } else {
+          evalProgBar.className = 'h-full rounded-full transition-all duration-300 bg-gradient-to-r from-rose-600 to-amber-500';
+        }
+      }
+
+      const evalTargetBadge = document.getElementById('eval-target-badge');
+      if (evalTargetBadge) {
+        if (curScore >= 70) {
+          evalTargetBadge.textContent = (T && T.evalTargetReached) ? T.evalTargetReached : '¡Meta de Hito Cumplida (≥70%)!';
+          evalTargetBadge.className = 'text-[10px] px-2 py-0.5 rounded-full font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
+        } else {
+          const gap = 70 - curScore;
+          const prefix = (T && T.evalTargetGapPrefix) ? T.evalTargetGapPrefix : 'Brecha:';
+          const suffix = (T && T.evalTargetGapSuffix) ? T.evalTargetGapSuffix : 'para meta de Hito (70%)';
+          evalTargetBadge.textContent = `${prefix} -${gap}% ${suffix}`;
+          evalTargetBadge.className = curScore >= 35
+            ? 'text-[10px] px-2 py-0.5 rounded-full font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30'
+            : 'text-[10px] px-2 py-0.5 rounded-full font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30';
+        }
+      }
+
+      // Consola de Evaluación: Criterios Checklist específicos por fase
+      const criteriaMap = {
+        es: {
+          1: [
+            '1. Diagnóstico de línea base y conformación de equipo técnico (+25%)',
+            '2. Formulación de estudios de viabilidad y coordinación NEPIO (+25%)',
+            '3. Consulta a partes interesadas y redacción de borrador técnico (+25%)',
+            '4. Aprobación gubernamental en el Comprehensive Report (Hito 1) (+25%)'
+          ],
+          2: [
+            '1. Estructura institucional permanente y asignación presupuestal (+25%)',
+            '2. Marcos reglamentarios y especificaciones técnicas de licitación (+25%)',
+            '3. Evaluación de ofertas contractuales y caracterización de sitio (+25%)',
+            '4. Firma de contratos EPC / PPA y licencias preliminares (Hito 2) (+25%)'
+          ],
+          3: [
+            '1. Construcción civil de la isla nuclear e inspección regulatoria (+25%)',
+            '2. Montaje electromecánico y pruebas preoperacionales (+25%)',
+            '3. Cualificación de operadores de sala de control y planes de emergencia (+25%)',
+            '4. Carga de combustible, criticidad inicial y operación comercial (Hito 3) (+25%)'
+          ]
+        },
+        en: {
+          1: [
+            '1. Baseline assessment & designated technical team (+25%)',
+            '2. Feasibility studies & inter-agency NEPIO coordination (+25%)',
+            '3. Stakeholder consultation & technical draft preparation (+25%)',
+            '4. Sovereign government approval in Comprehensive Report (Milestone 1) (+25%)'
+          ],
+          2: [
+            '1. Permanent institutional framework & allocated budget (+25%)',
+            '2. Regulatory framework & technical tender specifications (+25%)',
+            '3. Bid evaluations & detailed site characterization (+25%)',
+            '4. EPC/PPA signing & preliminary licensing issued (Milestone 2) (+25%)'
+          ],
+          3: [
+            '1. Nuclear island civil construction & regulatory inspection (+25%)',
+            '2. Electromechanical assembly & pre-operational testing (+25%)',
+            '3. Control room operator qualification & emergency drills (+25%)',
+            '4. Fuel loading, initial criticality & commercial operation (Milestone 3) (+25%)'
+          ]
+        }
+      };
+
+      const langMap = criteriaMap[currentLang] || criteriaMap.es;
+      const phaseCritList = langMap[currentPhase] || langMap[1];
+      [1, 2, 3, 4].forEach(idx => {
+        const chk = document.getElementById('eval-chk-' + idx);
+        const txt = document.getElementById('eval-chk-' + idx + '-txt');
+        if (txt && phaseCritList[idx - 1]) txt.textContent = phaseCritList[idx - 1];
+        if (chk) chk.checked = curScore >= (idx * 25);
+      });
+
+      const chkStat = document.getElementById('eval-checklist-status');
+      if (chkStat) {
+        const completedCount = Math.min(4, Math.floor(curScore / 25));
+        chkStat.textContent = currentLang === 'es' ? `${completedCount} de 4 cumplidos` : `${completedCount} of 4 met`;
+      }
+
+      // Consola de Evaluación: Tira Multi-Fase
+      const scoreP1 = getIssueScore(issue, 1);
+      const scoreP2 = getIssueScore(issue, 2);
+      const scoreP3 = getIssueScore(issue, 3);
+      const elP1 = document.getElementById('eval-score-p1');
+      const elP2 = document.getElementById('eval-score-p2');
+      const elP3 = document.getElementById('eval-score-p3');
+      if (elP1) elP1.textContent = scoreP1 + '%';
+      if (elP2) elP2.textContent = scoreP2 + '%';
+      if (elP3) elP3.textContent = scoreP3 + '%';
+
+      const bdgP1 = document.getElementById('eval-badge-p1');
+      const bdgP2 = document.getElementById('eval-badge-p2');
+      const bdgP3 = document.getElementById('eval-badge-p3');
+      if (bdgP1) bdgP1.className = `px-2 py-0.5 rounded-lg border font-mono transition text-[10px] ${currentPhase === 1 ? 'border-cyan-400 bg-cyan-500/20 text-cyan-300 font-bold ring-1 ring-cyan-400/50' : 'border-slate-800 bg-slate-900 text-slate-400'}`;
+      if (bdgP2) bdgP2.className = `px-2 py-0.5 rounded-lg border font-mono transition text-[10px] ${currentPhase === 2 ? 'border-cyan-400 bg-cyan-500/20 text-cyan-300 font-bold ring-1 ring-cyan-400/50' : 'border-slate-800 bg-slate-900 text-slate-400'}`;
+      if (bdgP3) bdgP3.className = `px-2 py-0.5 rounded-lg border font-mono transition text-[10px] ${currentPhase === 3 ? 'border-cyan-400 bg-cyan-500/20 text-cyan-300 font-bold ring-1 ring-cyan-400/50' : 'border-slate-800 bg-slate-900 text-slate-400'}`;
+      
+      const govRole = t(profile.roles.gov);
+      const regRole = t(profile.roles.reg);
+      const opRole = t(profile.roles.op);
+
+      const govLabel = currentLang === 'es' ? 'Gobierno / NEPIO:' : 'Government / NEPIO:';
+      const regLabel = currentLang === 'es' ? 'Regulador:' : 'Regulator:';
+      const opLabel = currentLang === 'es' ? 'Operador:' : 'Operator:';
+
+      document.getElementById('card-issue-roles').innerHTML = `
+        <span>• <strong>${govLabel}</strong> ${govRole}</span><br>
+        <span>• <strong>${regLabel}</strong> ${regRole}</span><br>
+        <span>• <strong>${opLabel}</strong> ${opRole}</span>
+      `;
+
+      const deliverableText = getIssueText(issue.id, 'p' + currentPhase) || issue.phaseDeliverables['p' + currentPhase];
+      const gapText = getIssueText(issue.id, 'gap') || issue.criticalGaps;
+      const smrText = getIssueText(issue.id, 'smr') || issue.smrImpact;
+
+      document.getElementById('card-issue-deliverable').textContent = deliverableText;
+      document.getElementById('card-issue-gap').textContent = gapText;
+      document.getElementById('card-issue-smr').textContent = smrText;
+
+      // Actualizar botones rápidos de los 19 issues
+      renderQuickButtons();
+
+      // Si la matriz de evaluación rápida está desplegada, actualizar sus sliders
+      const panelMat = document.getElementById('panel-quick-matrix');
+      if (panelMat && !panelMat.classList.contains('hidden')) {
+        renderEvaluationMatrix();
       }
 
       // Gobernanza Roles
-      document.getElementById('roadmap-gov-role').textContent = profile.roles.gov;
-      document.getElementById('roadmap-reg-role').textContent = profile.roles.reg;
-      document.getElementById('roadmap-op-role').textContent = profile.roles.op;
+      document.getElementById('roadmap-gov-role').textContent = govRole;
+      document.getElementById('roadmap-reg-role').textContent = regRole;
+      document.getElementById('roadmap-op-role').textContent = opRole;
 
       // Comprehensive Report Studio
-      document.getElementById('cr-chapter-name').textContent = issue.crChapter;
-      document.getElementById('cr-box-title').innerHTML = `<span>📋</span> Contenido Exigido por OIEA para el Issue #${issue.code}: ${issue.name[currentLang]}`;
+      const chapterText = getIssueText(issue.id, 'chapter') || issue.crChapter;
+      document.getElementById('cr-chapter-name').textContent = chapterText;
+      const crBoxTitle = currentLang === 'es'
+        ? `<span>📋</span> Contenido Técnico Exigido por el OIEA para el Issue #${issue.code}: ${t(issue.name)}`
+        : `<span>📋</span> IAEA Required Technical Content for Issue #${issue.code}: ${t(issue.name)}`;
+      document.getElementById('cr-box-title').innerHTML = crBoxTitle;
       document.getElementById('cr-box-ref').textContent = issue.refOIEA;
-      document.getElementById('cr-sec-1').textContent = `${profile.name[currentLang]}: La gobernanza recae en ${profile.roles.gov}. Se debe formalizar la línea base técnica y jurídica.`;
-      document.getElementById('cr-sec-2').textContent = issue.phaseDeliverables.p1;
-      document.getElementById('cr-sec-3').textContent = issue.risks;
-      document.getElementById('cr-sec-4').textContent = issue.phaseDeliverables.p2;
+
+      const sec1Text = currentLang === 'es'
+        ? `${t(profile.name)}: La gobernanza recae en ${govRole}. Se debe formalizar la línea base técnica y jurídica.`
+        : `${t(profile.name)}: Governance is led by ${govRole}. Technical and legal baselines must be formalized.`;
+      document.getElementById('cr-sec-1').textContent = sec1Text;
+      document.getElementById('cr-sec-2').textContent = getIssueText(issue.id, 'p1') || issue.phaseDeliverables.p1;
+      document.getElementById('cr-sec-3').textContent = getIssueText(issue.id, 'risks') || issue.risks;
+      document.getElementById('cr-sec-4').textContent = getIssueText(issue.id, 'p2') || issue.phaseDeliverables.p2;
 
       // Simulador Decisión
-      document.getElementById('sim-country-name').textContent = profile.name[currentLang];
-      document.getElementById('sim-phase-tag').textContent = 'Fase ' + currentPhase;
-      document.getElementById('sim-milestone-status').textContent = readiness < 50 ? 'En Formulación (Estudios Iniciales)' : 'Maduro para Decisión Gubernamental';
-      document.getElementById('sim-tech-status').textContent = currentTech === 'smr' ? 'SMR (Reactores Modulares Pequeños)' : 'Gran Escala (1000+ MWe)';
-      document.getElementById('sim-time-status').textContent = currentPhase === 1 ? '18 a 36 meses' : (currentPhase === 2 ? '36 a 60 meses' : '48 a 72 meses');
+      document.getElementById('sim-country-name').textContent = t(profile.name);
+      document.getElementById('sim-phase-tag').textContent = (T ? T.phasePrefix : 'Fase ') + currentPhase;
+      
+      const milestoneStatus = readiness < 50 
+        ? (currentLang === 'es' ? 'En Formulación (Estudios Iniciales)' : 'In Formulation (Feasibility Studies)')
+        : (currentLang === 'es' ? 'Maduro para Decisión Gubernamental' : 'Ready for Sovereign Government Decision');
+      document.getElementById('sim-milestone-status').textContent = milestoneStatus;
+
+      const techStatus = currentTech === 'smr' 
+        ? (currentLang === 'es' ? 'SMR (Reactores Modulares Pequeños)' : 'SMR (Small Modular Reactors)')
+        : (currentLang === 'es' ? 'Gran Escala (1000+ MWe)' : 'Large Scale (1000+ MWe)');
+      document.getElementById('sim-tech-status').textContent = techStatus;
+
+      const timeStatus = currentPhase === 1 
+        ? (currentLang === 'es' ? '18 a 36 meses' : '18 to 36 months') 
+        : (currentPhase === 2 
+            ? (currentLang === 'es' ? '36 a 60 meses' : '36 to 60 months') 
+            : (currentLang === 'es' ? '48 a 72 meses' : '48 to 72 months'));
+      document.getElementById('sim-time-status').textContent = timeStatus;
 
       // Re-dibujar gráficos si están visibles
       if (currentTab === 'radar') renderRadarSVG();
     }
 
+    function toggleLanguage() {
+      currentLang = currentLang === 'es' ? 'en' : 'es';
+      applyLanguage();
+      updateUI();
+      renderRoadmapTimeline();
+      renderInirSliders();
+    }
+
     // Inicialización al cargar el DOM
     window.addEventListener('DOMContentLoaded', () => {
+      initEvaluatedScores();
+
       document.getElementById('country-select').addEventListener('change', (e) => {
         currentCountry = e.target.value;
         updateUI();
@@ -1329,14 +2139,15 @@
       });
 
       document.getElementById('btn-lang').addEventListener('click', () => {
-        currentLang = currentLang === 'es' ? 'en' : 'es';
-        document.getElementById('btn-lang').textContent = '🌐 ' + currentLang.toUpperCase();
-        updateUI();
+        toggleLanguage();
       });
 
       setPhase(1);
       setTab('radar');
+      applyLanguage();
       updateUI();
+      renderRoadmapTimeline();
+      renderInirSliders();
     });
   </script>
 </body>
