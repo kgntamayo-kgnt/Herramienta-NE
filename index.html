@@ -11,6 +11,7 @@
   <!-- Tailwind CSS CDN para renderizado instantáneo y responsivo -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="i18n.js"></script>
+  <script src="observatory.js"></script>
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -181,6 +182,9 @@
         </button>
         <button onclick="setTab('benchmark')" id="tab-btn-benchmark" class="tab-btn px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-2xl text-xs sm:text-sm font-bold transition flex items-center gap-1.5 bg-slate-900/80 hover:bg-slate-800 text-slate-400 border border-slate-800">
           <span>🔬</span> <span>D. Benchmark SMR</span>
+        </button>
+        <button onclick="setTab('observatory')" id="tab-btn-observatory" class="tab-btn px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-2xl text-xs sm:text-sm font-bold transition flex items-center gap-1.5 bg-slate-900/80 hover:bg-slate-800 text-slate-400 border border-slate-800">
+          <span>🌐</span> <span>E. Bases OIEA (ARIS & PRIS)</span>
         </button>
         <button onclick="setTab('simulator')" id="tab-btn-simulator" class="tab-btn px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-2xl text-xs sm:text-sm font-bold transition flex items-center gap-1.5 bg-slate-900/80 hover:bg-slate-800 text-slate-400 border border-slate-800">
           <span>⚖️</span> <span>Simulador Decisión</span>
@@ -668,6 +672,267 @@
             </div>
           </div>
         </div>
+
+        <!-- Enlace Directo a Repositorios Oficiales OIEA ARIS & PRIS -->
+        <div class="mt-6 p-4 rounded-2xl bg-slate-950/70 border border-slate-800 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-cyan-500/20 text-cyan-300 flex items-center justify-center font-bold text-lg flex-shrink-0">
+              🌐
+            </div>
+            <div>
+              <div class="text-xs font-bold text-white flex items-center gap-2">
+                <span>Repositorios Oficiales del OIEA: Diseños Avanzados (ARIS) y Flota Global (PRIS)</span>
+              </div>
+              <p class="text-[11px] text-slate-400 mt-0.5">
+                Accede a las fichas técnicas autorizadas de más de 90 reactores avanzados en ARIS y al historial operativo mundial en PRIS.
+              </p>
+            </div>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <a href="https://aris.iaea.org/" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 rounded-xl bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-300 border border-indigo-500/40 text-xs font-bold transition flex items-center gap-1.5">
+              <span>⚛️</span> <span>IAEA ARIS ↗</span>
+            </a>
+            <a href="https://pris-stats.iaea.org/" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 rounded-xl bg-cyan-600/30 hover:bg-cyan-600/50 text-cyan-300 border border-cyan-500/40 text-xs font-bold transition flex items-center gap-1.5">
+              <span>📊</span> <span>IAEA PRIS ↗</span>
+            </a>
+            <button type="button" onclick="setTab('observatory')" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 text-xs font-bold transition flex items-center gap-1">
+              <span>Explorar en Cockpit →</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- =========================================================================
+        MÓDULO E: OBSERVATORIOS OFICIALES OIEA (ARIS & PRIS)
+    ========================================================================= -->
+    <div id="panel-observatory" class="tab-panel hidden space-y-6">
+      <!-- Encabezado de Observatorios -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 sm:p-6 shadow-2xl relative overflow-hidden">
+        <div class="absolute -right-20 -top-20 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -left-20 -bottom-20 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 pb-5 border-b border-slate-800">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-mono font-bold px-3 py-1 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                IAEA Authoritative Databases
+              </span>
+              <span class="text-xs font-mono font-bold px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                ARIS & PRIS Integration
+              </span>
+            </div>
+            <h2 id="obs-main-title" class="text-lg sm:text-xl font-bold text-white mt-2 flex items-center gap-2">
+              <span>🌐</span> Bases Oficiales OIEA: Diseños Avanzados (ARIS) & Parque Nuclear Global (PRIS)
+            </h2>
+            <p id="obs-main-subtitle" class="text-xs text-slate-400 mt-1 max-w-3xl">
+              Integración de los dos grandes repositorios de datos del Organismo Internacional de Energía Atómica para fundamentar la selección de reactores y el análisis comparativo global
+            </p>
+          </div>
+
+          <!-- Botones de Enlace Rápido Directo a Portales Oficiales -->
+          <div class="flex flex-wrap items-center gap-2.5">
+            <a href="https://aris.iaea.org/" target="_blank" rel="noopener noreferrer" class="px-4 py-2 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow-lg shadow-indigo-600/30 transition flex items-center gap-2">
+              <span>⚛️</span> <span>Portal ARIS OIEA ↗</span>
+            </a>
+            <a href="https://pris-stats.iaea.org/" target="_blank" rel="noopener noreferrer" class="px-4 py-2 rounded-2xl bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-black text-xs shadow-lg shadow-cyan-500/30 transition flex items-center gap-2">
+              <span>📊</span> <span>Portal PRIS OIEA ↗</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Tarjetas Duales ARIS vs PRIS -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-5">
+          <!-- Tarjeta ARIS -->
+          <div class="p-4 sm:p-5 rounded-2xl bg-indigo-950/30 border border-indigo-500/40 relative overflow-hidden flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-mono font-bold px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">ARIS • aris.iaea.org</span>
+                <span id="aris-card-badge" class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-indigo-400 text-slate-950">Diseños & SMR</span>
+              </div>
+              <h3 id="aris-card-title" class="text-sm font-bold text-white flex items-center gap-1.5">
+                <span>⚛️</span> Advanced Reactors Information System (ARIS)
+              </h3>
+              <p id="aris-card-desc" class="text-xs text-slate-300 mt-2 leading-relaxed">
+                Base de datos oficial de diseño técnico del OIEA con más de 90 reactores avanzados (SMR, microrreactores, reactores rápidos y de alta temperatura). Incluye parámetros de licenciamiento, sistemas pasivos de seguridad y folletos de diseño.
+              </p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-indigo-900/50 flex items-center justify-between text-xs">
+              <span class="text-indigo-300 text-[11px] font-mono">Aspecto OIEA #09 (Tecnología)</span>
+              <a href="https://aris.iaea.org/" target="_blank" rel="noopener noreferrer" id="aris-open-btn" class="text-cyan-400 hover:text-cyan-300 font-bold flex items-center gap-1">
+                Explorar Portal Oficial ARIS (aris.iaea.org) ↗
+              </a>
+            </div>
+          </div>
+
+          <!-- Tarjeta PRIS -->
+          <div class="p-4 sm:p-5 rounded-2xl bg-cyan-950/30 border border-cyan-500/40 relative overflow-hidden flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-mono font-bold px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">PRIS • pris-stats.iaea.org</span>
+                <span id="pris-card-badge" class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-cyan-400 text-slate-950">Centrales & Operación</span>
+              </div>
+              <h3 id="pris-card-title" class="text-sm font-bold text-white flex items-center gap-1.5">
+                <span>📊</span> Power Reactor Information System (PRIS)
+              </h3>
+              <p id="pris-card-desc" class="text-xs text-slate-300 mt-2 leading-relaxed">
+                La base estadística autorizada de centrales nucleares en el mundo, mantenida por el OIEA desde 1970. Registra más de 20.600 años-reactor de experiencia acumulada, factores de carga, generación eléctrica anual y reactores en construcción.
+              </p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-cyan-900/50 flex items-center justify-between text-xs">
+              <span class="text-cyan-300 text-[11px] font-mono">Aspecto OIEA #02 / #13 (Seguridad & O&M)</span>
+              <a href="https://pris-stats.iaea.org/" target="_blank" rel="noopener noreferrer" id="pris-open-btn" class="text-cyan-400 hover:text-cyan-300 font-bold flex items-center gap-1">
+                Consultar Estadísticas Oficiales PRIS (pris-stats.iaea.org) ↗
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cuadro de Orientación Estratégica para la NEPIO -->
+        <div class="mt-5 p-4 rounded-2xl bg-slate-950/80 border border-slate-800 text-xs">
+          <div id="nepio-guidance-title" class="text-cyan-400 font-bold uppercase tracking-wider text-[11px] mb-1 flex items-center gap-2">
+            <span>💡</span> Orientación Estratégica para la NEPIO con Datos ARIS & PRIS:
+          </div>
+          <p id="nepio-guidance-text" class="text-slate-300 leading-relaxed">
+            Para el Hito 1 y Hito 2 (Comprehensive Report y Licitación), el OIEA estipula que los países principiantes deben evaluar la madurez tecnológica comprobada (datos PRIS) frente a las ventajas modulares de nueva generación (fichas ARIS), evitando el riesgo de primer prototipo comercial (FOAK) sin las debidas garantías del proveedor.
+          </p>
+        </div>
+      </div>
+
+      <!-- SECCIÓN PRIS: DASHBOARD GLOBAL DE LA FLOTA NUCLEAR CIVIL -->
+      <div class="bg-slate-900/80 border border-slate-800 rounded-3xl p-5 sm:p-6 shadow-xl space-y-5">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+              <h3 class="text-base font-bold text-white flex items-center gap-2">
+                <span>📊</span> Monitor Mundial PRIS: Estadísticas Globales Oficiales OIEA
+              </h3>
+            </div>
+            <p class="text-xs text-slate-400 mt-0.5">
+              Datos consolidados del parque civil nuclear internacional (<a href="https://pris-stats.iaea.org/" target="_blank" rel="noopener noreferrer" class="text-cyan-400 hover:underline">pris-stats.iaea.org</a>)
+            </p>
+          </div>
+          <a href="https://pris-stats.iaea.org/" target="_blank" rel="noopener noreferrer" class="text-xs font-bold px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700 transition flex items-center gap-1">
+            <span>Explorar PRIS en Línea ↗</span>
+          </a>
+        </div>
+
+        <!-- 6 KPIs Estadísticos Mundiales PRIS -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+          <div class="p-3 rounded-2xl bg-slate-950/70 border border-slate-800 flex flex-col justify-between">
+            <span id="pris-stat-lbl-1" class="text-[10px] text-slate-400 font-semibold uppercase">Reactores Operativos</span>
+            <div class="text-xl sm:text-2xl font-black text-emerald-400 font-mono mt-1">416</div>
+            <span class="text-[9px] text-slate-500 font-mono mt-0.5">En 32 países</span>
+          </div>
+
+          <div class="p-3 rounded-2xl bg-slate-950/70 border border-slate-800 flex flex-col justify-between">
+            <span id="pris-stat-lbl-2" class="text-[10px] text-slate-400 font-semibold uppercase">Capacidad Neta Total</span>
+            <div class="text-xl sm:text-2xl font-black text-cyan-400 font-mono mt-1">375.4 <span class="text-xs text-slate-400">GWe</span></div>
+            <span class="text-[9px] text-slate-500 font-mono mt-0.5">Capacidad activa</span>
+          </div>
+
+          <div class="p-3 rounded-2xl bg-slate-950/70 border border-slate-800 flex flex-col justify-between">
+            <span id="pris-stat-lbl-3" class="text-[10px] text-slate-400 font-semibold uppercase">En Construcción Activa</span>
+            <div class="text-xl sm:text-2xl font-black text-amber-400 font-mono mt-1">61 <span class="text-xs text-slate-400">unid.</span></div>
+            <span class="text-[9px] text-slate-500 font-mono mt-0.5">~68.5 GWe en 16 países</span>
+          </div>
+
+          <div class="p-3 rounded-2xl bg-slate-950/70 border border-slate-800 flex flex-col justify-between">
+            <span id="pris-stat-lbl-4" class="text-[10px] text-slate-400 font-semibold uppercase">Experiencia Acumulada</span>
+            <div class="text-xl sm:text-2xl font-black text-indigo-300 font-mono mt-1">>20.680</div>
+            <span class="text-[9px] text-slate-500 font-mono mt-0.5">Años-reactor civiles</span>
+          </div>
+
+          <div class="p-3 rounded-2xl bg-slate-950/70 border border-slate-800 flex flex-col justify-between">
+            <span id="pris-stat-lbl-5" class="text-[10px] text-slate-400 font-semibold uppercase">Generación Anual</span>
+            <div class="text-xl sm:text-2xl font-black text-purple-400 font-mono mt-1">2.602 <span class="text-xs text-slate-400">TWh</span></div>
+            <span class="text-[9px] text-slate-500 font-mono mt-0.5">~10% elec. mundial</span>
+          </div>
+
+          <div class="p-3 rounded-2xl bg-slate-950/70 border border-slate-800 flex flex-col justify-between">
+            <span id="pris-stat-lbl-6" class="text-[10px] text-slate-400 font-semibold uppercase">CO₂ Evitado Anual</span>
+            <div class="text-xl sm:text-2xl font-black text-cyan-300 font-mono mt-1">~1.8 <span class="text-xs text-slate-400">Gt</span></div>
+            <span class="text-[9px] text-slate-500 font-mono mt-0.5">Segunda mayor baja en C</span>
+          </div>
+        </div>
+
+        <!-- Tabla Interactiva de Flotas por País (PRIS Country Statistics) -->
+        <div class="pt-2">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-3">
+            <h4 class="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
+              <span>🌐</span> Desglose de Flotas Nucleares por País (Fuente: OIEA PRIS)
+            </h4>
+            <input type="text" id="pris-country-search" oninput="onPrisCountrySearch(this.value)" placeholder="Buscar país (ej. Estados Unidos, Francia, Argentina, Brasil, China)..."
+              class="w-full sm:w-72 bg-slate-950 border border-slate-700/80 rounded-xl px-3 py-1.5 text-xs text-slate-100 placeholder-slate-500 outline-none focus:border-cyan-400 transition">
+          </div>
+
+          <div class="overflow-x-auto rounded-2xl border border-slate-800 max-h-80 overflow-y-auto">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-950/90 text-slate-400 uppercase text-[10px] font-mono border-b border-slate-800 sticky top-0 backdrop-blur">
+                <tr>
+                  <th class="p-3">País / Región</th>
+                  <th class="p-3 text-center">Reactores Operativos</th>
+                  <th class="p-3 text-right">Potencia Neta (GWe)</th>
+                  <th class="p-3 text-center">Cuota Nuclear (%)</th>
+                  <th class="p-3 text-center">En Construcción</th>
+                  <th class="p-3">Notas Relevantes</th>
+                  <th class="p-3 text-center">Enlace PRIS</th>
+                </tr>
+              </thead>
+              <tbody id="pris-countries-tbody" class="divide-y divide-slate-800/80"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECCIÓN ARIS: EXPLORADOR INTERACTIVO DE REACTORES AVANZADOS & SMR -->
+      <div class="bg-slate-900/80 border border-slate-800 rounded-3xl p-5 sm:p-6 shadow-xl space-y-5">
+        <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3 pb-3 border-b border-slate-800">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-indigo-400 animate-ping"></span>
+              <h3 class="text-base font-bold text-white flex items-center gap-2">
+                <span>⚛️</span> Catálogo Oficial OIEA ARIS: Diseños Avanzados & Reactores Modulares (SMR)
+              </h3>
+            </div>
+            <p class="text-xs text-slate-400 mt-0.5">
+              Fichas técnicas y parámetros oficiales extraídos del Advanced Reactors Information System (<a href="https://aris.iaea.org/" target="_blank" rel="noopener noreferrer" class="text-cyan-400 hover:underline">aris.iaea.org</a>)
+            </p>
+          </div>
+
+          <!-- Buscador y Enlace Externo ARIS -->
+          <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
+            <input type="text" id="aris-search-input" oninput="onArisSearch(this.value)" placeholder="Buscar reactor por nombre, diseñador o país (ej. NuScale, BWRX-300, Rolls-Royce, CAREM, AP1000)..."
+              class="w-full sm:w-80 bg-slate-950 border border-slate-700/80 rounded-xl px-3.5 py-2 text-xs text-slate-100 placeholder-slate-500 outline-none focus:border-indigo-400 transition">
+            <a href="https://aris.iaea.org/" target="_blank" rel="noopener noreferrer" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-slate-700 text-xs font-bold transition flex items-center gap-1">
+              <span>Portal ARIS ↗</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Filtros por Categoría de Reactor -->
+        <div class="flex flex-wrap items-center gap-2 text-xs">
+          <span class="text-slate-400 font-semibold text-[11px]">Filtrar por Tecnología:</span>
+          <button type="button" onclick="setArisFilter('all')" id="aris-btn-all" class="px-3 py-1 rounded-xl text-xs font-bold bg-indigo-600 text-white shadow transition">
+            Todos los Diseños
+          </button>
+          <button type="button" onclick="setArisFilter('smr')" id="aris-btn-smr" class="px-3 py-1 rounded-xl text-xs font-medium bg-slate-800 text-slate-300 hover:text-white transition">
+            ⚛️ SMR (<300 MWe)
+          </button>
+          <button type="button" onclick="setArisFilter('micro')" id="aris-btn-micro" class="px-3 py-1 rounded-xl text-xs font-medium bg-slate-800 text-slate-300 hover:text-white transition">
+            🔬 Microrreactores (<20 MWe)
+          </button>
+          <button type="button" onclick="setArisFilter('gen4')" id="aris-btn-gen4" class="px-3 py-1 rounded-xl text-xs font-medium bg-slate-800 text-slate-300 hover:text-white transition">
+            🔥 Generación IV
+          </button>
+          <button type="button" onclick="setArisFilter('large')" id="aris-btn-large" class="px-3 py-1 rounded-xl text-xs font-medium bg-slate-800 text-slate-300 hover:text-white transition">
+            🏭 Gran Escala (>1000 MWe)
+          </button>
+        </div>
+
+        <!-- Cuadrícula de Tarjetas de Reactores ARIS -->
+        <div id="aris-reactors-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-2"></div>
       </div>
     </div>
 
@@ -1470,6 +1735,7 @@
       if (tabKey === 'radar') renderRadarSVG();
       if (tabKey === 'roadmap') renderRoadmapTimeline();
       if (tabKey === 'inir') renderInirSliders();
+      if (tabKey === 'observatory') renderObservatory();
     }
 
     function t(val) {
@@ -1685,6 +1951,7 @@
       setBtn('tab-btn-roadmap', '⚡', T.tabRoadmap);
       setBtn('tab-btn-studio', '📑', T.tabStudio);
       setBtn('tab-btn-benchmark', '🔬', T.tabBenchmark);
+      setBtn('tab-btn-observatory', '🌐', T.tabObservatory);
       setBtn('tab-btn-simulator', '⚖️', T.tabSimulator);
       setBtn('tab-btn-inir', '📝', T.tabInir);
 
@@ -1840,6 +2107,58 @@
       if (inirSub) inirSub.textContent = T.inirSubtitle;
       const inirBtn = document.getElementById('inir-sample-btn');
       if (inirBtn) inirBtn.textContent = T.inirSampleBtn;
+
+      // Traducciones Observatorios OIEA (ARIS & PRIS)
+      const obsMainT = document.getElementById('obs-main-title');
+      if (obsMainT) obsMainT.innerHTML = `<span>🌐</span> ${T.obsMainTitle || 'Bases Oficiales OIEA: Diseños Avanzados (ARIS) & Parque Nuclear Global (PRIS)'}`;
+      const obsMainSub = document.getElementById('obs-main-subtitle');
+      if (obsMainSub) obsMainSub.textContent = T.obsMainSubtitle || '';
+      const arisCardT = document.getElementById('aris-card-title');
+      if (arisCardT) arisCardT.innerHTML = `<span>⚛️</span> ${T.arisCardTitle || 'Advanced Reactors Information System (ARIS)'}`;
+      const arisCardB = document.getElementById('aris-card-badge');
+      if (arisCardB) arisCardB.textContent = T.arisCardBadge || 'Diseños & SMR';
+      const arisCardD = document.getElementById('aris-card-desc');
+      if (arisCardD) arisCardD.textContent = T.arisCardDesc || '';
+      const arisOpenB = document.getElementById('aris-open-btn');
+      if (arisOpenB) arisOpenB.textContent = T.arisOpenBtn || 'Explorar Portal Oficial ARIS (aris.iaea.org) ↗';
+      const prisCardT = document.getElementById('pris-card-title');
+      if (prisCardT) prisCardT.innerHTML = `<span>📊</span> ${T.prisCardTitle || 'Power Reactor Information System (PRIS)'}`;
+      const prisCardB = document.getElementById('pris-card-badge');
+      if (prisCardB) prisCardB.textContent = T.prisCardBadge || 'Centrales & Operación';
+      const prisCardD = document.getElementById('pris-card-desc');
+      if (prisCardD) prisCardD.textContent = T.prisCardDesc || '';
+      const prisOpenB = document.getElementById('pris-open-btn');
+      if (prisOpenB) prisOpenB.textContent = T.prisOpenBtn || 'Consultar Estadísticas Oficiales PRIS (pris-stats.iaea.org) ↗';
+      const nepioGT = document.getElementById('nepio-guidance-title');
+      if (nepioGT) nepioGT.innerHTML = `<span>💡</span> ${T.nepioGuidanceTitle || 'Orientación Estratégica para la NEPIO con Datos ARIS & PRIS:'}`;
+      const nepioGD = document.getElementById('nepio-guidance-text');
+      if (nepioGD) nepioGD.textContent = T.nepioGuidanceText || '';
+      const prisStat1 = document.getElementById('pris-stat-lbl-1');
+      if (prisStat1) prisStat1.textContent = T.prisStatReactors || 'Reactores Operativos';
+      const prisStat2 = document.getElementById('pris-stat-lbl-2');
+      if (prisStat2) prisStat2.textContent = T.prisStatCapacity || 'Capacidad Neta Total';
+      const prisStat3 = document.getElementById('pris-stat-lbl-3');
+      if (prisStat3) prisStat3.textContent = T.prisStatConstruction || 'En Construcción Activa';
+      const prisStat4 = document.getElementById('pris-stat-lbl-4');
+      if (prisStat4) prisStat4.textContent = T.prisStatExperience || 'Experiencia Acumulada';
+      const prisStat5 = document.getElementById('pris-stat-lbl-5');
+      if (prisStat5) prisStat5.textContent = T.prisStatGeneration || 'Generación Anual';
+      const prisStat6 = document.getElementById('pris-stat-lbl-6');
+      if (prisStat6) prisStat6.textContent = T.prisStatEmissions || 'CO₂ Evitado Anual';
+      const arisSearchIn = document.getElementById('aris-search-input');
+      if (arisSearchIn) arisSearchIn.placeholder = T.arisSearchPlaceholder || 'Buscar reactor...';
+      const prisSearchIn = document.getElementById('pris-country-search');
+      if (prisSearchIn) prisSearchIn.placeholder = T.prisCountrySearch || 'Buscar país...';
+      const arisBtnAll = document.getElementById('aris-btn-all');
+      if (arisBtnAll) arisBtnAll.textContent = T.arisFilterAll || 'Todos los Diseños';
+      const arisBtnSmr = document.getElementById('aris-btn-smr');
+      if (arisBtnSmr) arisBtnSmr.textContent = '⚛️ ' + (T.arisFilterSmr || 'SMR (<300 MWe)');
+      const arisBtnMicro = document.getElementById('aris-btn-micro');
+      if (arisBtnMicro) arisBtnMicro.textContent = '🔬 ' + (T.arisFilterMicro || 'Microrreactores (<20 MWe)');
+      const arisBtnGen4 = document.getElementById('aris-btn-gen4');
+      if (arisBtnGen4) arisBtnGen4.textContent = '🔥 ' + (T.arisFilterGen4 || 'Generación IV');
+      const arisBtnLarge = document.getElementById('aris-btn-large');
+      if (arisBtnLarge) arisBtnLarge.textContent = '🏭 ' + (T.arisFilterLarge || 'Gran Escala (>1000 MWe)');
 
       // Traducciones Consola de Evaluación
       const evalCardT = document.getElementById('eval-card-title');
@@ -2105,12 +2424,257 @@
       if (currentTab === 'radar') renderRadarSVG();
     }
 
+    // =========================================================================
+    // OBSERVATORIO OIEA: MOTORES DE RENDERIZADO ARIS & PRIS
+    // =========================================================================
+    let arisCurrentFilter = 'all';
+    let arisSearchQuery = '';
+    let prisCountrySearchQuery = '';
+
+    function setArisFilter(filterType) {
+      arisCurrentFilter = filterType;
+      const filters = ['all', 'smr', 'micro', 'gen4', 'large'];
+      filters.forEach(f => {
+        const btn = document.getElementById('aris-btn-' + f);
+        if (btn) {
+          if (f === filterType) {
+            btn.className = "px-3 py-1 rounded-xl text-xs font-bold bg-indigo-600 text-white shadow transition";
+          } else {
+            btn.className = "px-3 py-1 rounded-xl text-xs font-medium bg-slate-800 text-slate-300 hover:text-white transition";
+          }
+        }
+      });
+      renderArisReactors();
+    }
+
+    function onArisSearch(query) {
+      arisSearchQuery = (query || '').toLowerCase().trim();
+      renderArisReactors();
+    }
+
+    function onPrisCountrySearch(query) {
+      prisCountrySearchQuery = (query || '').toLowerCase().trim();
+      renderPrisCountries();
+    }
+
+    function renderArisReactors() {
+      const container = document.getElementById('aris-reactors-grid');
+      if (!container) return;
+
+      const data = window.ARIS_REACTORS_DATA || [];
+      const isEn = currentLang === 'en';
+
+      const filtered = data.filter(item => {
+        // Filtro por tecnología
+        if (arisCurrentFilter !== 'all') {
+          if (arisCurrentFilter === 'smr' && item.category !== 'smr') return false;
+          if (arisCurrentFilter === 'micro' && item.category !== 'micro') return false;
+          if (arisCurrentFilter === 'gen4' && item.category !== 'gen4') return false;
+          if (arisCurrentFilter === 'large' && item.category !== 'large') return false;
+        }
+
+        // Filtro de búsqueda
+        if (arisSearchQuery) {
+          const matchName = item.name.toLowerCase().includes(arisSearchQuery);
+          const matchVendor = item.vendor.toLowerCase().includes(arisSearchQuery);
+          const matchCountry = (item.country + ' ' + (item.countryEn || '')).toLowerCase().includes(arisSearchQuery);
+          const matchType = (item.type + ' ' + (item.typeEn || '')).toLowerCase().includes(arisSearchQuery);
+          const matchCat = item.category.toLowerCase().includes(arisSearchQuery);
+          const matchHighlights = (item.highlights || []).concat(item.highlightsEn || []).join(' ').toLowerCase().includes(arisSearchQuery);
+          if (!matchName && !matchVendor && !matchCountry && !matchType && !matchCat && !matchHighlights) {
+            return false;
+          }
+        }
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="col-span-full p-8 text-center bg-slate-950/60 rounded-2xl border border-slate-800">
+            <span class="text-3xl block mb-2">🔍</span>
+            <p class="text-sm font-semibold text-slate-300">${isEn ? 'No reactors found matching your criteria.' : 'No se encontraron reactores que coincidan con la búsqueda.'}</p>
+            <p class="text-xs text-slate-500 mt-1">${isEn ? 'Try adjusting your search terms or filter.' : 'Intenta ajustar los términos de búsqueda o cambiar el filtro.'}</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = filtered.map(r => {
+        const country = isEn ? (r.countryEn || r.country) : r.country;
+        const type = isEn ? (r.typeEn || r.type) : r.type;
+        const coolant = isEn ? (r.coolantEn || r.coolant) : r.coolant;
+        const status = isEn ? (r.statusEn || r.status) : r.status;
+        const passive = isEn ? (r.passiveSafetyEn || r.passiveSafety) : r.passiveSafety;
+        const epz = isEn ? (r.epzEn || r.epz) : r.epz;
+        const target = isEn ? (r.deployTargetEn || r.deployTarget) : r.deployTarget;
+        const highlights = isEn ? (r.highlightsEn || r.highlights) : r.highlights;
+
+        let catBadge = '';
+        if (r.category === 'smr') {
+          catBadge = `<span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">SMR (&lt;300 MWe)</span>`;
+        } else if (r.category === 'micro') {
+          catBadge = `<span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">Micro (&lt;20 MWe)</span>`;
+        } else if (r.category === 'gen4') {
+          catBadge = `<span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">Gen IV</span>`;
+        } else {
+          catBadge = `<span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">Gran Escala</span>`;
+        }
+
+        return `
+          <div class="p-4 rounded-2xl bg-slate-950/70 border border-slate-800 hover:border-slate-700 transition flex flex-col justify-between shadow-lg">
+            <div>
+              <div class="flex items-start justify-between gap-2 mb-2">
+                <div>
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <span class="text-base">${r.flag || '⚛️'}</span>
+                    <h4 class="text-sm font-bold text-white">${r.name}</h4>
+                  </div>
+                  <span class="text-[11px] text-slate-400 block">${r.vendor} • ${country}</span>
+                </div>
+                ${catBadge}
+              </div>
+
+              <!-- Fila de Potencia Eléctrica y Térmica -->
+              <div class="grid grid-cols-2 gap-2 my-2.5 p-2 rounded-xl bg-slate-900/90 border border-slate-800/80 text-[11px]">
+                <div>
+                  <span class="text-slate-400 block text-[9px] uppercase font-mono">${isEn ? 'Net Power' : 'Potencia Neta'}</span>
+                  <span class="text-emerald-400 font-black font-mono text-sm">${r.powerMWe} MWe</span>
+                </div>
+                <div>
+                  <span class="text-slate-400 block text-[9px] uppercase font-mono">${isEn ? 'Thermal Power' : 'Potencia Térmica'}</span>
+                  <span class="text-cyan-300 font-bold font-mono text-sm">${r.powerMWth} MWth</span>
+                </div>
+              </div>
+
+              <!-- Tipo y Refrigerante -->
+              <div class="space-y-1.5 text-[11px] text-slate-300">
+                <div class="flex items-start gap-1.5">
+                  <span class="text-slate-500 font-mono">Tipo:</span>
+                  <span class="text-slate-200 font-medium">${type}</span>
+                </div>
+                <div class="flex items-start gap-1.5">
+                  <span class="text-slate-500 font-mono">${isEn ? 'Coolant:' : 'Refrigerante:'}</span>
+                  <span class="text-slate-300">${coolant}</span>
+                </div>
+                <div class="p-2 rounded-lg bg-indigo-950/30 border border-indigo-900/40 text-[10px] text-indigo-200 leading-snug">
+                  <strong class="text-indigo-300 block mb-0.5">🛡️ ${isEn ? 'Passive Safety System:' : 'Seguridad Pasiva OIEA:'}</strong>
+                  ${passive}
+                </div>
+                <div class="flex items-center justify-between text-[10px] text-slate-400 pt-1">
+                  <span>📍 EPZ: <strong class="text-slate-200">${epz}</strong></span>
+                  <span>🎯 <strong class="text-cyan-400 font-mono">${target.split(' ')[0]}</strong></span>
+                </div>
+              </div>
+
+              <!-- Aspectos Destacados -->
+              ${highlights && highlights.length ? `
+                <div class="mt-3 pt-2 border-t border-slate-800/80">
+                  <span class="text-[10px] text-slate-400 font-semibold block mb-1 uppercase font-mono">${isEn ? 'IAEA Benchmark Notes:' : 'Claves de Evaluación OIEA:'}</span>
+                  <ul class="text-[10px] text-slate-300 space-y-1 list-disc list-inside">
+                    ${highlights.map(h => `<li class="leading-tight">${h}</li>`).join('')}
+                  </ul>
+                </div>
+              ` : ''}
+            </div>
+
+            <!-- Footer con Enlace Oficial ARIS -->
+            <div class="mt-3 pt-2.5 border-t border-slate-800 flex items-center justify-between text-[11px]">
+              <span class="text-[10px] text-slate-400 truncate max-w-[140px]" title="${status}">${status}</span>
+              <a href="${r.arisUrl || 'https://aris.iaea.org/'}" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 rounded-lg bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-300 hover:text-white font-bold transition flex items-center gap-1">
+                <span>Ficha ARIS</span>
+                <span>↗</span>
+              </a>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderPrisCountries() {
+      const tbody = document.getElementById('pris-countries-tbody');
+      if (!tbody) return;
+
+      const data = window.PRIS_COUNTRIES_DATA || [];
+      const isEn = currentLang === 'en';
+
+      const filtered = data.filter(c => {
+        if (!prisCountrySearchQuery) return true;
+        const name = (c.country + ' ' + (c.countryEn || '') + ' ' + (c.code || '')).toLowerCase();
+        const notes = (c.notes || '').toLowerCase();
+        return name.includes(prisCountrySearchQuery) || notes.includes(prisCountrySearchQuery);
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" class="p-6 text-center text-slate-400">
+              ${isEn ? 'No countries match your search.' : 'No se encontraron países que coincidan con la búsqueda.'}
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(c => {
+        const countryName = isEn ? (c.countryEn || c.country) : c.country;
+        const constBadge = c.underConst > 0 
+          ? `<span class="px-2 py-0.5 rounded-full font-mono font-bold text-[11px] bg-amber-500/20 text-amber-300 border border-amber-500/30">+${c.underConst}</span>`
+          : `<span class="text-slate-600 font-mono">—</span>`;
+
+        return `
+          <tr class="hover:bg-slate-900/60 transition">
+            <td class="p-3 font-medium text-white flex items-center gap-2">
+              <span class="text-base">${c.flag || '🏳️'}</span>
+              <div>
+                <span class="block">${countryName}</span>
+                <span class="text-[9px] text-slate-500 font-mono">${c.code || ''}</span>
+              </div>
+            </td>
+            <td class="p-3 text-center">
+              <span class="px-2.5 py-0.5 rounded-full font-mono font-bold text-xs bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                ${c.operational}
+              </span>
+            </td>
+            <td class="p-3 text-right font-mono font-bold text-slate-200">
+              ${c.capacityGWe.toFixed(c.capacityGWe % 1 === 0 ? 1 : 2)} <span class="text-[10px] text-slate-500 font-normal">GWe</span>
+            </td>
+            <td class="p-3 text-center font-mono">
+              <div class="flex items-center justify-center gap-1.5">
+                <span class="font-bold text-cyan-300">${c.sharePct}%</span>
+                <div class="w-12 bg-slate-950 h-1.5 rounded-full overflow-hidden border border-slate-800 hidden sm:block">
+                  <div class="h-full bg-cyan-400 rounded-full" style="width: ${Math.min(c.sharePct, 100)}%;"></div>
+                </div>
+              </div>
+            </td>
+            <td class="p-3 text-center">
+              ${constBadge}
+            </td>
+            <td class="p-3 text-slate-300 text-[11px] max-w-xs leading-snug">
+              ${c.notes || ''}
+            </td>
+            <td class="p-3 text-center">
+              <a href="https://pris-stats.iaea.org/" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 rounded-lg bg-cyan-600/20 hover:bg-cyan-600/40 text-cyan-300 hover:text-white font-bold transition inline-flex items-center gap-1 text-[11px]">
+                <span>PRIS</span>
+                <span>↗</span>
+              </a>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function renderObservatory() {
+      renderArisReactors();
+      renderPrisCountries();
+    }
+
     function toggleLanguage() {
       currentLang = currentLang === 'es' ? 'en' : 'es';
       applyLanguage();
       updateUI();
       renderRoadmapTimeline();
       renderInirSliders();
+      renderObservatory();
     }
 
     // Inicialización al cargar el DOM
@@ -2148,6 +2712,7 @@
       updateUI();
       renderRoadmapTimeline();
       renderInirSliders();
+      renderObservatory();
     });
   </script>
 </body>
