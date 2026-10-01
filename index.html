@@ -12,6 +12,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="i18n.js"></script>
   <script src="observatory.js"></script>
+  <script src="ai-assistant.js"></script>
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -582,6 +583,515 @@
               <p id="cr-sec-4" class="text-slate-300 leading-relaxed"></p>
             </div>
           </div>
+        </div>
+      </div>
+
+      <!-- =========================================================================
+          SUB-MÓDULO: ASISTENTE DE IA PARA EVALUACIÓN Y CARGUE DE DOCUMENTOS OIEA
+      ========================================================================= -->
+      <div class="bg-gradient-to-b from-slate-900 via-slate-900/95 to-slate-950 border-2 border-indigo-500/40 rounded-3xl p-5 sm:p-6 shadow-2xl relative overflow-hidden space-y-6">
+        <div class="absolute -right-24 -top-24 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -left-24 -bottom-24 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <!-- Encabezado del Asistente de IA -->
+        <div class="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+          <div>
+            <div class="flex items-center gap-2">
+              <span id="ai-auditor-badge" class="text-xs font-mono font-bold px-3 py-1 rounded-full bg-gradient-to-r from-indigo-500/20 to-cyan-500/20 text-cyan-300 border border-cyan-500/40 flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+                <span>Auditor Inteligente OIEA • Gemini 3.8 Flash</span>
+              </span>
+              <span class="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
+                IAEA NG-G-3.1 Rev. 2 & NG-T-3.14
+              </span>
+            </div>
+            <h3 id="ai-auditor-title" class="text-lg sm:text-2xl font-black text-white mt-2 flex items-center gap-2">
+              <span>🤖</span> <span>Asistente de IA para Evaluación y Cargue de Documentos</span>
+            </h3>
+            <p id="ai-auditor-subtitle" class="text-xs text-slate-300 mt-1 max-w-3xl">
+              Carga borradores normativos, capítulos del Comprehensive Report, estudios de viabilidad o proyectos de ley para auditar su conformidad con las directrices del OIEA.
+            </p>
+          </div>
+
+          <!-- Acciones rápidas pre-cargadas -->
+          <div class="flex flex-col items-start md:items-end gap-1.5 text-xs">
+            <span class="text-[10px] text-slate-400 uppercase font-mono tracking-wider">Cargar Borradores de Prueba:</span>
+            <div class="flex flex-wrap gap-1.5">
+              <button type="button" onclick="window.aiAuditor.loadSample('sample1')" class="px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700 text-[11px] font-semibold transition flex items-center gap-1">
+                <span>🇨🇴</span> <span>Cap. 1: Política</span>
+              </button>
+              <button type="button" onclick="window.aiAuditor.loadSample('sample2')" class="px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-slate-700 text-[11px] font-semibold transition flex items-center gap-1">
+                <span>⚖️</span> <span>Cap. 5: Ley Nuclear</span>
+              </button>
+              <button type="button" onclick="window.aiAuditor.loadSample('sample3')" class="px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-slate-700 text-[11px] font-semibold transition flex items-center gap-1">
+                <span>⚛️</span> <span>Cap. 9: SMR</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Controles de Configuración de la Evaluación -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
+          <!-- Selector de Capítulo / Aspecto -->
+          <div class="bg-slate-950/80 p-3 rounded-2xl border border-slate-800">
+            <label id="ai-sel-chap-lbl" for="ai-select-chapter" class="text-[11px] font-bold text-slate-300 block mb-1.5">
+              Capítulo / Aspecto a Evaluar:
+            </label>
+            <select id="ai-select-chapter" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs font-semibold text-cyan-300 outline-none focus:border-cyan-400 transition cursor-pointer">
+              <optgroup label="📋 Cuadernos Técnicos OIEA (19 Issues)">
+                <option value="1">Issue #01: Posición Nacional y NEPIO</option>
+                <option value="2">Issue #02: Seguridad Nuclear</option>
+                <option value="3">Issue #03: Marco de Gestión</option>
+                <option value="4">Issue #04: Financiamiento y Financiación</option>
+                <option value="5">Issue #05: Marco Legal Nuclear</option>
+                <option value="6">Issue #06: Marco Regulatorio</option>
+                <option value="7">Issue #07: Salvaguardias Nucleares</option>
+                <option value="8">Issue #08: Protección Radiológica</option>
+                <option value="9">Issue #09: Red Eléctrica e Infraestructura</option>
+                <option value="10">Issue #10: Recursos Humanos y Educación</option>
+                <option value="11">Issue #11: Partes Interesadas y Comunicación</option>
+                <option value="12">Issue #12: Emplazamiento e Instalaciones</option>
+                <option value="13">Issue #13: Protección Ambiental</option>
+                <option value="14">Issue #14: Planificación de Emergencias (EP&R)</option>
+                <option value="15">Issue #15: Seguridad Física Nuclear</option>
+                <option value="16">Issue #16: Ciclo del Combustible Nuclear</option>
+                <option value="17">Issue #17: Desechos Radiactivos y Combustible Gastado</option>
+                <option value="18">Issue #18: Participación Industrial Nacional</option>
+                <option value="19">Issue #19: Adquisiciones y Cadena de Suministro</option>
+              </optgroup>
+              <optgroup label="🌐 Documento Consolidado">
+                <option value="all">Documento Global (Comprehensive Report Completo)</option>
+              </optgroup>
+            </select>
+          </div>
+
+          <!-- Selector de Fase Objetivo -->
+          <div class="bg-slate-950/80 p-3 rounded-2xl border border-slate-800">
+            <label id="ai-sel-phase-lbl" for="ai-select-phase" class="text-[11px] font-bold text-slate-300 block mb-1.5">
+              Fase y Hito Objetivo OIEA:
+            </label>
+            <select id="ai-select-phase" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs font-semibold text-amber-300 outline-none focus:border-amber-400 transition cursor-pointer">
+              <option value="1">Fase 1 (Hito 1: Decisión Soberana / Comprehensive Report)</option>
+              <option value="2">Fase 2 (Hito 2: Licitación, Contratos y Regulador)</option>
+              <option value="3">Fase 3 (Hito 3: Construcción y Comisionamiento)</option>
+            </select>
+          </div>
+
+          <!-- Tipo de Documento / Estado -->
+          <div class="bg-slate-950/80 p-3 rounded-2xl border border-slate-800 sm:col-span-2 lg:col-span-1 flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-bold text-slate-300">Normativa de Referencia:</span>
+              <span class="text-[10px] font-mono text-cyan-400 font-bold">OIEA NG-G-3.1</span>
+            </div>
+            <div class="text-[11px] text-slate-400 mt-1">
+              Evaluación contra los 19 aspectos, estándares de seguridad SF-1 y directrices de prefactibilidad TECDOC-1993.
+            </div>
+          </div>
+        </div>
+
+        <!-- Zona de Cargue de Archivos y Editor de Texto -->
+        <div class="space-y-3">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+            <label class="text-xs font-bold text-slate-200 flex items-center gap-1.5">
+              <span>📄</span> <span id="ai-upload-prompt-txt">Cargue de Documento (.pdf, .docx, .txt, .md) o Borrador Escrito:</span>
+            </label>
+            <div class="flex items-center gap-2">
+              <span id="ai-doc-wordcount" class="text-[11px] font-mono text-slate-400 bg-slate-950 px-2 py-0.5 rounded-lg border border-slate-800">
+                0 palabras
+              </span>
+              <button type="button" onclick="window.aiAuditor.clearDocument()" class="text-[11px] text-slate-400 hover:text-rose-400 transition font-medium">
+                ✕ Limpiar
+              </button>
+            </div>
+          </div>
+
+          <!-- Dropzone Interactivo -->
+          <div id="ai-doc-dropzone" class="border-2 border-dashed border-slate-700/80 hover:border-cyan-500/60 rounded-2xl p-4 sm:p-5 bg-slate-950/60 transition cursor-pointer text-center relative group" onclick="document.getElementById('ai-doc-file-input').click()">
+            <input type="file" id="ai-doc-file-input" accept=".pdf,.docx,.doc,.txt,.md,.rtf,.json" class="hidden">
+            <div class="flex flex-col items-center justify-center gap-2 pointer-events-none">
+              <div class="w-10 h-10 rounded-2xl bg-indigo-500/20 text-cyan-300 flex items-center justify-center text-xl group-hover:scale-110 transition">
+                📥
+              </div>
+              <div class="text-xs font-semibold text-slate-200">
+                Haz clic para subir un archivo o arrástralo y suéltalo aquí
+              </div>
+              <p class="text-[11px] text-slate-400">
+                Formatos admitidos: <strong>PDF oficial</strong>, <strong>Word (.docx)</strong>, Markdown (.md), o Texto plano (.txt)
+              </p>
+            </div>
+          </div>
+
+          <!-- Badge de Archivo Cargado -->
+          <div id="ai-doc-file-status" class="hidden p-3 rounded-xl bg-indigo-950/40 border border-indigo-500/40 flex items-center justify-between gap-3 text-xs">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <span class="text-lg">📎</span>
+              <div class="truncate">
+                <span id="ai-doc-file-name" class="font-bold text-white truncate block">documento.pdf</span>
+                <span id="ai-doc-file-size" class="text-[10px] text-slate-400 font-mono">0 KB</span>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <span id="ai-doc-file-badge" class="px-2 py-0.5 rounded-lg bg-indigo-500/30 text-indigo-200 text-[10px] font-mono font-bold">PDF</span>
+              <button type="button" onclick="window.aiAuditor.clearDocument()" class="text-slate-400 hover:text-rose-400 text-xs p-1" title="Eliminar archivo">✕</button>
+            </div>
+          </div>
+
+          <!-- Editor / Área de Texto Directo -->
+          <div>
+            <textarea id="ai-doc-textarea" rows="6" placeholder="Pega aquí el texto del documento, borrador de ley, estudio de prefactibilidad o capítulo técnico para evaluar..."
+              class="w-full bg-slate-950/90 border border-slate-700/80 rounded-2xl p-3.5 text-xs text-slate-100 placeholder-slate-500 outline-none focus:border-cyan-400 transition font-sans leading-relaxed"></textarea>
+          </div>
+
+          <!-- Botón Principal de Auditoría -->
+          <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
+            <div class="text-[11px] text-slate-400 flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+              <span>Análisis con motor de razonamiento OIEA • Gemini 3.8 Flash</span>
+            </div>
+            <button type="button" id="ai-eval-btn" onclick="window.aiAuditor.evaluateDocument()"
+              class="w-full sm:w-auto px-6 py-3 rounded-2xl bg-gradient-to-r from-cyan-500 via-indigo-600 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-black text-xs sm:text-sm shadow-xl shadow-cyan-500/25 border border-cyan-300/40 transition-all flex items-center justify-center gap-2 cursor-pointer">
+              <span>🔍</span> <span id="ai-eval-btn-text">Auditar y Evaluar Documento con IA</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Estado de Carga / Animación de Análisis -->
+        <div id="ai-eval-loading" class="hidden p-6 rounded-2xl bg-slate-950/90 border border-cyan-500/30 text-center space-y-4">
+          <div class="relative w-16 h-16 mx-auto flex items-center justify-center">
+            <div class="absolute inset-0 rounded-full border-4 border-cyan-500/20 border-t-cyan-400 animate-spin"></div>
+            <span class="text-2xl animate-pulse">⚛️</span>
+          </div>
+          <div>
+            <h4 class="text-sm font-bold text-white">Auditoría OIEA en Curso</h4>
+            <p id="ai-loading-step-txt" class="text-xs text-cyan-300 font-mono mt-1">
+              Analizando documento contra normativas OIEA...
+            </p>
+          </div>
+          <div class="max-w-md mx-auto h-1.5 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
+            <div class="h-full bg-gradient-to-r from-cyan-400 to-indigo-500 rounded-full animate-pulse w-3/4"></div>
+          </div>
+        </div>
+
+        <!-- ===================================================================
+            PANEL DE RESULTADOS DE LA AUDITORÍA DE IA
+        =================================================================== -->
+        <div id="ai-eval-results" class="hidden space-y-6 pt-4 border-t border-slate-800">
+          <!-- Hero Card del Veredicto y Calificación -->
+          <div class="bg-gradient-to-r from-slate-950 to-slate-900/90 p-5 sm:p-6 rounded-3xl border border-indigo-500/40 shadow-xl space-y-4">
+            <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+              <div>
+                <span class="text-[10px] font-mono uppercase font-bold tracking-wider text-slate-400 block mb-1">
+                  Dictamen Oficial de Madurez OIEA
+                </span>
+                <div class="flex flex-wrap items-center gap-3">
+                  <div id="ai-res-score-value" class="text-4xl sm:text-5xl font-black font-mono text-emerald-400">
+                    75%
+                  </div>
+                  <div>
+                    <span id="ai-res-verdict-badge" class="text-xs font-bold px-3 py-1 rounded-full border bg-emerald-500/20 text-emerald-300 border-emerald-500/40">
+                      Conforme con Hito OIEA
+                    </span>
+                    <div id="ai-res-target-info" class="text-xs text-emerald-300 font-semibold mt-1">
+                      ✓ Nivel Aprobatorio (≥70% OIEA)
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Botones de Acción Superior -->
+              <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
+                <button type="button" onclick="window.aiAuditor.exportEvaluationReport()"
+                  class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold border border-slate-700 transition flex items-center gap-1.5 cursor-pointer">
+                  <span>📥</span> <span>Exportar Dictamen</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Barra de Progreso con Marca de Meta -->
+            <div>
+              <div class="relative w-full h-3 bg-slate-900 rounded-full overflow-hidden border border-slate-800 p-0.5">
+                <div id="ai-res-progress-bar" class="h-full rounded-full transition-all duration-700 bg-gradient-to-r from-emerald-500 to-cyan-400" style="width: 75%;"></div>
+                <!-- Línea de Meta 70% -->
+                <div class="absolute top-0 bottom-0 left-[70%] w-0.5 bg-emerald-400/80 shadow-[0_0_8px_rgba(16,185,129,0.8)] z-10" title="Meta de Cumplimiento OIEA (70%)"></div>
+              </div>
+              <div class="flex justify-between text-[10px] text-slate-500 font-mono mt-1">
+                <span>0% Brecha Crítica</span>
+                <span>35% En Progreso</span>
+                <span class="text-emerald-400 font-bold">70% Meta de Hito</span>
+                <span>100% Pleno</span>
+              </div>
+            </div>
+
+            <!-- =============================================================
+                MÓDULO DE APROBACIÓN DEL USUARIO PARA INCLUSIÓN EN EL SEGUIMIENTO
+            ============================================================= -->
+            <div id="ai-approval-card" class="mt-3 p-4 rounded-2xl bg-slate-900/90 border-2 border-emerald-500/40 shadow-inner space-y-3">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-slate-800">
+                <div class="flex items-center gap-2">
+                  <span id="ai-approval-status-dot" class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse"></span>
+                  <span id="ai-approval-card-title" class="text-xs font-black text-white uppercase tracking-wider">
+                    Aprobación del Usuario para Inclusión en el Seguimiento Oficial
+                  </span>
+                </div>
+                <span id="ai-approval-badge" class="text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                  ⏳ Pendiente de Aprobación
+                </span>
+              </div>
+
+              <p class="text-xs text-slate-300 leading-relaxed">
+                Este dictamen técnico de IA es una propuesta consultiva. <strong>Mediante tu aprobación explícita</strong>, este resultado se registrará oficialmente en la Bitácora de Seguimiento de Infraestructura y calibrará la madurez del aspecto en el Cockpit (Radar, Consola e INIR).
+              </p>
+
+              <!-- Comparativa de Puntuación y Ajuste Fino -->
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 p-3 rounded-xl bg-slate-950/80 border border-slate-800 text-xs">
+                <div>
+                  <span class="text-[10px] text-slate-400 block font-semibold">Aspecto a Actualizar:</span>
+                  <span id="ai-appr-issue-txt" class="font-bold text-cyan-300 truncate block mt-0.5">#01 - Posición Nacional</span>
+                </div>
+                <div>
+                  <span class="text-[10px] text-slate-400 block font-semibold">Calificación Actual vs Propuesta IA:</span>
+                  <span class="font-mono font-bold text-slate-200 block mt-0.5">
+                    <span id="ai-appr-cur-score" class="text-slate-400">45%</span> ➜ <span id="ai-appr-new-score" class="text-emerald-400 font-black">75%</span>
+                  </span>
+                </div>
+                <div>
+                  <label for="ai-approve-score-input" class="text-[10px] text-slate-400 block font-semibold">Calificación Final a Ratificar (%):</label>
+                  <div class="flex items-center gap-1.5 mt-0.5">
+                    <input type="number" id="ai-approve-score-input" min="0" max="100" value="75"
+                      class="w-16 bg-slate-900 border border-emerald-500/50 rounded-lg px-2 py-0.5 text-center font-mono font-black text-xs text-emerald-300 outline-none">
+                    <span class="text-[10px] text-slate-400 font-mono">(Editable)</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Campo de Nota del Revisor / NEPIO -->
+              <div class="space-y-1">
+                <label for="ai-approve-note-input" class="text-[11px] font-semibold text-slate-300 flex items-center justify-between">
+                  <span>Nota u Observación del Revisor para la Bitácora (Opcional):</span>
+                  <span class="text-[10px] text-slate-500 font-mono">Trazabilidad oficial</span>
+                </label>
+                <input type="text" id="ai-approve-note-input"
+                  placeholder="Ej: Aprobado por el Comité Técnico NEPIO tras verificar cumplimiento de la norma OIEA..."
+                  class="w-full bg-slate-950 border border-slate-700/80 rounded-xl px-3 py-1.5 text-xs text-slate-100 placeholder-slate-500 outline-none focus:border-cyan-400 transition">
+              </div>
+
+              <!-- Botones de Decisión del Usuario -->
+              <div class="flex flex-wrap items-center justify-between gap-2 pt-1">
+                <div class="flex items-center gap-2">
+                  <button type="button" id="ai-confirm-approve-btn" onclick="window.aiAuditor.approveAndTrack()"
+                    class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 text-white font-black text-xs shadow-lg shadow-emerald-600/30 border border-emerald-400/40 transition flex items-center gap-2 cursor-pointer">
+                    <span>✅</span> <span>Aprobar e Incluir en el Seguimiento Oficial</span>
+                  </button>
+                  <button type="button" onclick="window.aiAuditor.discardEvaluation()"
+                    class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-rose-950/40 text-slate-400 hover:text-rose-300 text-xs font-semibold border border-slate-700 transition cursor-pointer">
+                    <span>✕</span> <span>Descartar</span>
+                  </button>
+                </div>
+                <span id="ai-approve-timestamp" class="text-[10px] font-mono text-slate-400"></span>
+              </div>
+
+              <!-- Panel de Confirmación de Aprobación Incorporada al Seguimiento -->
+              <div id="ai-sync-toast" class="hidden p-4 rounded-2xl bg-gradient-to-r from-emerald-950/90 via-slate-900 to-cyan-950/90 border-2 border-emerald-500/70 shadow-2xl space-y-3">
+                <div class="flex items-start justify-between gap-3">
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-base border border-emerald-500/40">✓</div>
+                    <div>
+                      <h4 class="text-xs font-bold text-white uppercase tracking-wider">¡Evaluación Aprobada e Incorporada al Seguimiento Oficial!</h4>
+                      <p id="ai-sync-toast-msg" class="text-xs text-emerald-300 mt-0.5 leading-relaxed"></p>
+                    </div>
+                  </div>
+                  <span id="ai-sync-toast-folio" class="text-[10px] font-mono px-2 py-0.5 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 whitespace-nowrap"></span>
+                </div>
+                <div class="flex flex-wrap items-center gap-2 pt-1 border-t border-emerald-500/20">
+                  <button type="button" onclick="window.aiAuditor.viewInRadarFromToast()" class="px-3.5 py-1.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs shadow-md shadow-cyan-600/30 transition flex items-center gap-1.5 cursor-pointer">
+                    <span>🕸️</span> <span>Ver Impacto en el Radar de Seguimiento (Pestaña A)</span>
+                  </button>
+                  <button type="button" onclick="window.aiAuditor.scrollToTrackingLedger()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs border border-slate-700 transition flex items-center gap-1.5 cursor-pointer">
+                    <span>📋</span> <span>Ver en la Bitácora de Documentos</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          <!-- Resumen Ejecutivo de la Auditoría -->
+          <div class="bg-slate-950/80 p-5 rounded-2xl border border-slate-800 space-y-2">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-cyan-400 flex items-center gap-1.5">
+              <span>📋</span> <span id="ai-exec-summary-title">Resumen Ejecutivo del Asistente OIEA:</span>
+            </h4>
+            <p id="ai-res-executive-summary" class="text-xs text-slate-300 leading-relaxed font-sans"></p>
+          </div>
+
+          <!-- Verificación de Criterios Mandatorios del Hito -->
+          <div class="bg-slate-950/80 p-5 rounded-2xl border border-slate-800 space-y-3">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-200 flex items-center gap-1.5">
+              <span>🎯</span> <span id="ai-checklist-title">Verificación de Criterios Mandatorios para el Hito:</span>
+            </h4>
+            <div id="ai-res-checklist-container" class="space-y-2.5"></div>
+          </div>
+
+          <!-- Grid de Fortalezas & Brechas Críticas -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Fortalezas -->
+            <div class="p-4 sm:p-5 rounded-2xl bg-emerald-950/20 border border-emerald-500/30 space-y-3">
+              <h4 class="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+                <span>✓</span> <span id="ai-strengths-title">Fortalezas Identificadas en el Documento:</span>
+              </h4>
+              <ul id="ai-res-strengths-list" class="space-y-2"></ul>
+            </div>
+
+            <!-- Brechas Críticas -->
+            <div class="p-4 sm:p-5 rounded-2xl bg-rose-950/20 border border-rose-500/30 space-y-3">
+              <h4 class="text-xs font-bold uppercase tracking-wider text-rose-400 flex items-center gap-1.5">
+                <span>⚠️</span> <span id="ai-gaps-title">Brechas Críticas y Omisiones Detectadas:</span>
+              </h4>
+              <ul id="ai-res-gaps-list" class="space-y-2"></ul>
+            </div>
+          </div>
+
+          <!-- Recomendaciones Concretas de Redacción -->
+          <div class="p-4 sm:p-5 rounded-2xl bg-indigo-950/25 border border-indigo-500/35 space-y-3">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-indigo-300 flex items-center gap-1.5">
+              <span>💡</span> <span id="ai-recs-title">Recomendaciones Concretas para la Redacción y Fortalecimiento:</span>
+            </h4>
+            <div id="ai-res-recommendations-list" class="space-y-2"></div>
+          </div>
+
+          <!-- Cláusulas y Textos Sugeridos por la IA -->
+          <div class="p-4 sm:p-5 rounded-2xl bg-slate-950/90 border border-slate-800 space-y-3">
+            <div class="flex items-center justify-between">
+              <h4 class="text-xs font-bold uppercase tracking-wider text-cyan-300 flex items-center gap-1.5">
+                <span>✍️</span> <span id="ai-snippets-title">Cláusulas y Textos Recomendados por la IA para Incorporar:</span>
+              </h4>
+              <span class="text-[10px] text-slate-500 font-mono">Listas para copiar y pegar</span>
+            </div>
+            <div id="ai-res-snippets-container" class="space-y-3"></div>
+          </div>
+
+          <!-- Orientación Estratégica para la NEPIO -->
+          <div class="p-4 rounded-2xl bg-gradient-to-r from-cyan-950/30 to-indigo-950/30 border border-cyan-500/40 text-xs">
+            <strong class="text-cyan-300 block mb-1 uppercase text-[11px] tracking-wider">📌 Acción Inmediata Recomendada para el Comité NEPIO:</strong>
+            <p id="ai-res-nepio-action" class="text-slate-300 leading-relaxed font-sans"></p>
+          </div>
+
+          <!-- Asesor de Redacción Interactivo (Consultas OIEA) -->
+          <div class="p-4 sm:p-5 rounded-3xl bg-slate-950/90 border border-slate-800 space-y-4">
+            <div class="flex items-center justify-between">
+              <h4 class="text-xs font-bold uppercase tracking-wider text-slate-200 flex items-center gap-2">
+                <span>💬</span> <span id="ai-chat-title">Consultas y Aclaraciones con el Asesor OIEA</span>
+              </h4>
+              <span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 font-mono">Chat Interactivo</span>
+            </div>
+
+            <!-- Sugerencias de Preguntas Rápidas -->
+            <div class="flex flex-wrap items-center gap-1.5 text-[11px]">
+              <span class="text-slate-400 text-[10px]">Preguntas sugeridas:</span>
+              <button type="button" onclick="window.aiAuditor.askRedactionAdvisor('¿Cómo redacto la cláusula de separación regulatoria según la norma OIEA GSR Part 1?')"
+                class="px-2.5 py-1 rounded-xl bg-slate-900 hover:bg-slate-800 text-cyan-300 border border-slate-800 transition cursor-pointer">
+                ¿Cómo redactar la escisión regulatoria?
+              </button>
+              <button type="button" onclick="window.aiAuditor.askRedactionAdvisor('¿Qué convenciones internacionales del OIEA son obligatorias para el Hito 1?')"
+                class="px-2.5 py-1 rounded-xl bg-slate-900 hover:bg-slate-800 text-cyan-300 border border-slate-800 transition cursor-pointer">
+                ¿Qué tratados son obligatorios?
+              </button>
+              <button type="button" onclick="window.aiAuditor.askRedactionAdvisor('¿Cómo justificar la adopción de SMR frente a termoeléctricas de carbón?')"
+                class="px-2.5 py-1 rounded-xl bg-slate-900 hover:bg-slate-800 text-cyan-300 border border-slate-800 transition cursor-pointer">
+                ¿Cómo justificar SMR vs carbón?
+              </button>
+            </div>
+
+            <!-- Historial de Chat -->
+            <div id="ai-chat-history" class="space-y-3 max-h-72 overflow-y-auto pr-1"></div>
+
+            <!-- Campo de Entrada de Consulta -->
+            <div class="flex items-center gap-2 bg-slate-900 p-1.5 rounded-2xl border border-slate-700/80">
+              <input type="text" id="ai-chat-input" onkeydown="if(event.key === 'Enter') window.aiAuditor.askRedactionAdvisor()"
+                placeholder="Haz una pregunta sobre cómo mejorar la redacción del documento, requisitos del OIEA o normativas..."
+                class="flex-1 bg-transparent px-3 py-1.5 text-xs text-slate-100 placeholder-slate-500 outline-none">
+              <button type="button" onclick="window.aiAuditor.askRedactionAdvisor()"
+                class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs transition flex items-center gap-1 cursor-pointer">
+                <span>Enviar</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- =========================================================================
+          TABLERO Y BITÁCORA OFICIAL DE SEGUIMIENTO DOCUMENTAL DEL PROGRAMA NUCLEAR
+      ========================================================================= -->
+      <div id="ai-tracking-ledger-card" class="bg-slate-900/90 border-2 border-slate-800 hover:border-slate-700/80 rounded-3xl p-5 sm:p-6 shadow-2xl space-y-5 transition">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+              <h3 id="ai-ledger-title" class="text-base sm:text-lg font-black text-white flex items-center gap-2">
+                <span>📋</span> <span>Bitácora Oficial de Seguimiento Documental (Entregables Auditados y Aprobados)</span>
+              </h3>
+            </div>
+            <p id="ai-ledger-subtitle" class="text-xs text-slate-400 mt-0.5">
+              Registro histórico de documentos auditados con IA y ratificados mediante aprobación del usuario para el seguimiento del Hito
+            </p>
+          </div>
+
+          <!-- Acciones de la Bitácora -->
+          <div class="flex flex-wrap items-center gap-2">
+            <button type="button" onclick="window.aiAuditor.exportTrackingReport()"
+              class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer">
+              <span>📥</span> <span>Exportar Bitácora</span>
+            </button>
+            <button type="button" onclick="window.aiAuditor.clearTrackingLog()"
+              class="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-rose-950/40 text-slate-400 hover:text-rose-300 border border-slate-700 text-xs font-semibold transition cursor-pointer" title="Limpiar bitácora local">
+              <span>Limpiar</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 3 KPIs de Seguimiento Documental -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div class="p-3.5 rounded-2xl bg-slate-950/80 border border-slate-800 flex items-center justify-between">
+            <div>
+              <span class="text-[10px] text-slate-400 font-semibold uppercase block">Entregables Aprobados</span>
+              <div id="ai-kpi-docs-count" class="text-2xl font-black text-emerald-400 font-mono mt-0.5">0</div>
+            </div>
+            <span class="text-2xl">📄</span>
+          </div>
+
+          <div class="p-3.5 rounded-2xl bg-slate-950/80 border border-slate-800 flex items-center justify-between">
+            <div>
+              <span class="text-[10px] text-slate-400 font-semibold uppercase block">Aspectos con Trazabilidad</span>
+              <div id="ai-kpi-issues-count" class="text-2xl font-black text-cyan-400 font-mono mt-0.5">0 / 19</div>
+            </div>
+            <span class="text-2xl">🎯</span>
+          </div>
+
+          <div class="p-3.5 rounded-2xl bg-slate-950/80 border border-slate-800 flex items-center justify-between">
+            <div>
+              <span class="text-[10px] text-slate-400 font-semibold uppercase block">Madurez Promedio Documental</span>
+              <div id="ai-kpi-avg-score" class="text-2xl font-black text-indigo-300 font-mono mt-0.5">-- %</div>
+            </div>
+            <span class="text-2xl">📊</span>
+          </div>
+        </div>
+
+        <!-- Tabla de Registros Oficiales de Seguimiento -->
+        <div class="overflow-x-auto rounded-2xl border border-slate-800 max-h-80 overflow-y-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-950/90 text-slate-400 uppercase text-[10px] font-mono border-b border-slate-800 sticky top-0 backdrop-blur z-10">
+              <tr>
+                <th class="p-3">Folio / Fecha</th>
+                <th class="p-3">Aspecto OIEA</th>
+                <th class="p-3 text-center">Fase</th>
+                <th class="p-3">Documento Fuente</th>
+                <th class="p-3 text-center">Calificación Aprobada</th>
+                <th class="p-3 text-center">Estado OIEA</th>
+                <th class="p-3">Nota del Revisor</th>
+                <th class="p-3 text-center">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="ai-tracking-tbody" class="divide-y divide-slate-800/80">
+              <!-- Se puebla dinámicamente con renderTrackingLedger() -->
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
@@ -2042,6 +2552,60 @@
       const crSec4H = document.getElementById('cr-sec4-header');
       if (crSec4H) crSec4H.textContent = T.crSec4Title;
 
+      // Traducciones del Asistente de IA para Auditoría y Evaluación
+      const aiBadge = document.getElementById('ai-auditor-badge');
+      if (aiBadge) aiBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span> <span>${T.aiAuditorBadge || 'Auditor Inteligente OIEA'} • Gemini 3.8 Flash</span>`;
+      const aiTitle = document.getElementById('ai-auditor-title');
+      if (aiTitle) aiTitle.innerHTML = `<span>🤖</span> <span>${T.aiAuditorTitle || 'Asistente de IA para Evaluación y Cargue de Documentos'}</span>`;
+      const aiSub = document.getElementById('ai-auditor-subtitle');
+      if (aiSub) aiSub.textContent = T.aiAuditorSubtitle;
+      const aiChapLbl = document.getElementById('ai-sel-chap-lbl');
+      if (aiChapLbl) aiChapLbl.textContent = T.aiSelectChapterLabel;
+      const aiPhaseLbl = document.getElementById('ai-sel-phase-lbl');
+      if (aiPhaseLbl) aiPhaseLbl.textContent = T.aiSelectPhaseLabel;
+      const aiUpPrompt = document.getElementById('ai-upload-prompt-txt');
+      if (aiUpPrompt) aiUpPrompt.textContent = T.aiUploadPrompt;
+      const aiTextarea = document.getElementById('ai-doc-textarea');
+      if (aiTextarea && !aiTextarea.value) aiTextarea.placeholder = T.aiPastePlaceholder;
+      const aiEvalBtnTxt = document.getElementById('ai-eval-btn-text');
+      if (aiEvalBtnTxt) aiEvalBtnTxt.textContent = T.aiEvaluateBtn;
+      const aiExecSumT = document.getElementById('ai-exec-summary-title');
+      if (aiExecSumT) aiExecSumT.textContent = T.aiExecSummaryTitle;
+      const aiChecklistT = document.getElementById('ai-checklist-title');
+      if (aiChecklistT) aiChecklistT.textContent = T.aiChecklistTitle;
+      const aiStrengthsT = document.getElementById('ai-strengths-title');
+      if (aiStrengthsT) aiStrengthsT.textContent = T.aiStrengthsTitle;
+      const aiGapsT = document.getElementById('ai-gaps-title');
+      if (aiGapsT) aiGapsT.textContent = T.aiGapsTitle;
+      const aiRecsT = document.getElementById('ai-recs-title');
+      if (aiRecsT) aiRecsT.textContent = T.aiRecommendationsTitle;
+      const aiSnipT = document.getElementById('ai-snippets-title');
+      if (aiSnipT) aiSnipT.textContent = T.aiSnippetsTitle;
+      const aiChatT = document.getElementById('ai-chat-title');
+      if (aiChatT) aiChatT.textContent = T.aiChatTitle;
+      const aiChatIn = document.getElementById('ai-chat-input');
+      if (aiChatIn) aiChatIn.placeholder = T.aiChatPlaceholder;
+
+      const aiApprTitle = document.getElementById('ai-approval-card-title');
+      if (aiApprTitle) aiApprTitle.textContent = T.aiApprovalCardTitle || 'Aprobación del Usuario para Inclusión en el Seguimiento Oficial';
+      const aiConfirmBtn = document.getElementById('ai-confirm-approve-btn');
+      if (aiConfirmBtn && !aiConfirmBtn.disabled) {
+        aiConfirmBtn.innerHTML = `<span>✅</span> <span>${T.aiApproveBtnText || 'Aprobar e Incluir en el Seguimiento Oficial'}</span>`;
+      }
+      const aiLedgT = document.getElementById('ai-ledger-title');
+      if (aiLedgT) aiLedgT.innerHTML = `<span>📋</span> <span>${T.aiLedgerTitle || 'Bitácora Oficial de Seguimiento Documental'}</span>`;
+      const aiLedgSub = document.getElementById('ai-ledger-subtitle');
+      if (aiLedgSub) aiLedgSub.textContent = T.aiLedgerSubtitle || 'Registro histórico de documentos auditados con IA y ratificados mediante aprobación del usuario';
+
+      if (window.aiAuditor) {
+        if (typeof window.aiAuditor.populateChapterSelect === 'function') {
+          window.aiAuditor.populateChapterSelect();
+        }
+        if (typeof window.aiAuditor.renderTrackingLedger === 'function') {
+          window.aiAuditor.renderTrackingLedger();
+        }
+      }
+
       const bmT = document.getElementById('bm-title');
       if (bmT) bmT.innerHTML = `<span>🔬</span> ${T.bmTitle}`;
       const bmSub = document.getElementById('bm-subtitle');
@@ -2385,6 +2949,17 @@
       // Comprehensive Report Studio
       const chapterText = getIssueText(issue.id, 'chapter') || issue.crChapter;
       document.getElementById('cr-chapter-name').textContent = chapterText;
+
+      // Sincronizar selector de capítulo del auditor de IA
+      const aiChapterSel = document.getElementById('ai-select-chapter');
+      if (aiChapterSel && aiChapterSel.value !== 'all' && document.activeElement !== aiChapterSel) {
+        aiChapterSel.value = String(issue.id);
+      }
+      const aiSyncBtnLabel = document.getElementById('ai-sync-issue-name');
+      if (aiSyncBtnLabel) {
+        aiSyncBtnLabel.textContent = '#' + issue.code;
+      }
+
       const crBoxTitle = currentLang === 'es'
         ? `<span>📋</span> Contenido Técnico Exigido por el OIEA para el Issue #${issue.code}: ${t(issue.name)}`
         : `<span>📋</span> IAEA Required Technical Content for Issue #${issue.code}: ${t(issue.name)}`;
@@ -2706,6 +3281,29 @@
         toggleLanguage();
       });
 
+      // Sincronizar selector de los 19 issues del Asistente de IA con la Consola y el Radar
+      const aiSelect = document.getElementById('ai-select-chapter');
+      if (aiSelect) {
+        aiSelect.addEventListener('change', (e) => {
+          if (e.target.value !== 'all') {
+            const id = parseInt(e.target.value, 10);
+            if (!isNaN(id) && id > 0) {
+              selectIssue(id);
+            }
+          }
+        });
+      }
+
+      const aiPhaseSelect = document.getElementById('ai-select-phase');
+      if (aiPhaseSelect) {
+        aiPhaseSelect.addEventListener('change', (e) => {
+          const p = parseInt(e.target.value, 10);
+          if (!isNaN(p) && p >= 1 && p <= 3) {
+            setPhase(p);
+          }
+        });
+      }
+
       setPhase(1);
       setTab('radar');
       applyLanguage();
@@ -2713,6 +3311,40 @@
       renderRoadmapTimeline();
       renderInirSliders();
       renderObservatory();
+    });
+
+    // Exponer APIs para integración reactiva con el Asistente de IA
+    window.INFRASTRUCTURE_ISSUES = INFRASTRUCTURE_ISSUES;
+    window.COUNTRY_PROFILES = COUNTRY_PROFILES;
+    window.getIssueScore = getIssueScore;
+    window.setIssueScore = setIssueScore;
+    window.saveEvaluatedScores = saveEvaluatedScores;
+    window.evaluatedScores = evaluatedScores;
+    window.selectIssue = selectIssue;
+    window.setTab = setTab;
+    window.setPhase = setPhase;
+    window.updateUI = updateUI;
+    window.applyLanguage = applyLanguage;
+
+    Object.defineProperty(window, 'currentPhase', {
+      get() { return currentPhase; },
+      set(v) { setPhase(v); },
+      configurable: true
+    });
+    Object.defineProperty(window, 'currentCountry', {
+      get() { return currentCountry; },
+      set(v) { currentCountry = v; updateUI(); },
+      configurable: true
+    });
+    Object.defineProperty(window, 'currentLang', {
+      get() { return currentLang; },
+      set(v) { currentLang = v; applyLanguage(); updateUI(); },
+      configurable: true
+    });
+    Object.defineProperty(window, 'selectedIssueId', {
+      get() { return selectedIssueId; },
+      set(v) { selectIssue(v); },
+      configurable: true
     });
   </script>
 </body>
